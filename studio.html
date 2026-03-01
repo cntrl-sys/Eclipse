@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studio — Eclipse Interactive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Orbitron:wght@400;600;700&family=Rajdhani:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .tech-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .tech-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all var(--transition);
+    }
+    .tech-card:hover { border-color: var(--accent); background: var(--surface2); transform: translateY(-2px); }
+    .tech-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .tech-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 2px; }
+    .tech-cat { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+    .process-step {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 24px;
+      align-items: start;
+      padding: 32px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step-num {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      color: var(--accent);
+      opacity: 0.3;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon"></div>
+    Eclipse Interactive
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="games.html">Games</a></li>
+    <li><a href="downloads.html">Downloads</a></li>
+    <li><a href="studio.html">Studio</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-bg" style="background:radial-gradient(ellipse 60% 80% at 50% 0%, rgba(0,212,170,0.08), transparent);"></div>
+  <div class="container" style="position:relative;z-index:2;">
+    <div class="fade-up">
+      <span class="section-label">Inside Eclipse</span>
+      <h1 class="section-title">Our Studio</h1>
+      <p class="section-sub">How we work, what we use, and why we do it the way we do.</p>
+    </div>
+  </div>
+</div>
+
+<section style="padding-top:0;">
+  <div class="container">
+
+    <!-- Studio Philosophy -->
+    <div class="glass-card fade-up" style="margin-bottom:80px;text-align:center;padding:80px 60px;">
+      <div style="font-family:var(--font-display);font-size:1rem;letter-spacing:0.3em;color:var(--accent);margin-bottom:24px;text-transform:uppercase;">Philosophy</div>
+      <blockquote style="font-family:'Playfair Display',serif;font-size:clamp(1.5rem,3vw,2.5rem);font-style:italic;line-height:1.5;color:var(--text);max-width:800px;margin:0 auto;">
+        "We don't make games to sell units. We make games because somewhere out there, the player who needs that exact world exists — and it's our job to build it for them."
+      </blockquote>
+      <div style="margin-top:24px;font-size:0.875rem;color:var(--text-muted);">— Soren Keller, Creative Director</div>
+    </div>
+
+    <!-- Our Process -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;margin-bottom:80px;">
+      <div class="fade-up">
+        <span class="section-label">Process</span>
+        <h2 class="section-title" style="margin-bottom:40px;">How We Build</h2>
+        <div>
+          <div class="process-step">
+            <div class="step-num">01</div>
+            <div>
+              <h4 style="font-family:var(--font-display);font-size:1.1rem;margin-bottom:8px;">Dream</h4>
+              <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.7;">Every project starts with an emotion we want the player to feel. Not a mechanic, not a monetisation model — a feeling. We prototype rapidly, throw most of it away, and keep what feels true.</p>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="step-num">02</div>
+            <div>
+              <h4 style="font-family:var(--font-display);font-size:1.1rem;margin-bottom:8px;">Build</h4>
+              <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.7;">Iteration over perfection. We ship vertical slices to our community early and often, integrate feedback ruthlessly, and keep a flat hierarchy so good ideas come from anywhere.</p>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="step-num">03</div>
+            <div>
+              <h4 style="font-family:var(--font-display);font-size:1.1rem;margin-bottom:8px;">Polish</h4>
+              <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.7;">The last 20% is 80% of what players remember. We dedicate the final phase entirely to feel — animations, audio, transitions, feedback loops. This is where games go from good to unforgettable.</p>
+            </div>
+          </div>
+          <div class="process-step" style="border:none;">
+            <div class="step-num">04</div>
+            <div>
+              <h4 style="font-family:var(--font-display);font-size:1.1rem;margin-bottom:8px;">Ship &amp; Support</h4>
+              <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.7;">Shipping is the beginning, not the end. We patch, update, and listen. Our community Discord is where we live after launch.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fade-up" style="padding-top:80px;">
+        <span class="section-label">Workspace</span>
+        <h2 class="section-title" style="margin-bottom:24px;">Berlin Studio</h2>
+        <p style="color:var(--text-muted);line-height:1.9;margin-bottom:32px;">Our physical studio is a 200m² converted warehouse in Berlin-Kreuzberg, packed with reference books, concept art pinboards, a dedicated sound booth, and an embarrassing amount of action figures.</p>
+        <p style="color:var(--text-muted);line-height:1.9;margin-bottom:32px;">But we're also fully remote-capable — half the team works from home, and our async culture means great work happens across all time zones.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="glass-card" style="padding:24px;text-align:center;">
+            <div style="font-size:1.8rem;margin-bottom:8px;">🏙️</div>
+            <div style="font-family:var(--font-display);font-size:1rem;margin-bottom:4px;">Berlin HQ</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">Kreuzberg, Germany</div>
+          </div>
+          <div class="glass-card" style="padding:24px;text-align:center;">
+            <div style="font-size:1.8rem;margin-bottom:8px;">🌍</div>
+            <div style="font-family:var(--font-display);font-size:1rem;margin-bottom:4px;">Remote-First</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">We work from anywhere</div>
+          </div>
+          <div class="glass-card" style="padding:24px;text-align:center;">
+            <div style="font-size:1.8rem;margin-bottom:8px;">🎧</div>
+            <div style="font-family:var(--font-display);font-size:1rem;margin-bottom:4px;">Sound Studio</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">Full foley capability</div>
+          </div>
+          <div class="glass-card" style="padding:24px;text-align:center;">
+            <div style="font-size:1.8rem;margin-bottom:8px;">💬</div>
+            <div style="font-family:var(--font-display);font-size:1rem;margin-bottom:4px;">Open Discord</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">Community is family</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="fade-up" style="margin-bottom:80px;">
+      <span class="section-label">Technology</span>
+      <h2 class="section-title" style="margin-bottom:16px;">Our Tech Stack</h2>
+      <p style="color:var(--text-muted);margin-bottom:40px;max-width:500px;">We use the best tools for each job. No dogma, just results.</p>
+      <div class="tech-grid">
+        <div class="tech-card">
+          <div class="tech-icon" style="background:rgba(124,111,255,0.1);">🎮</div>
+          <div><div class="tech-name">Unity 2022 LTS</div><div class="tech-cat">Game Engine</div></div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon" style="background:rgba(0,212,170,0.1);">⚡</div>
+          <div><div class="tech-name">Unreal Engine 5</div><div class="tech-cat">High-End Projects</div></div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon" style="background:rgba(212,175,55,0.1);">🎨</div>
+          <div><div class="tech-name">Blender</div><div class="tech-cat">3D Art</div></div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon" style="background:rgba(168,85,247,0.1);">✏️</div>
+          <div><div class="tech-name">Photoshop / Substance</div><div class="tech-cat">Texturing</div></div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon" style="background:rgba(0,180,255,0.1);">🎵</div>
+          <div><div class="tech-name">FMOD Studio</div><div class="tech-cat">Audio</div></div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon" style="background:rgba(255,107,107,0.1);">📋</div>
+          <div><div class="tech-name">Notion + Linear</div><div class="tech-cat">Project Management</div></div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon" style="background:rgba(0,200,100,0.1);">🔧</div>
+          <div><div class="tech-name">Git / Perforce</div><div class="tech-cat">Version Control</div></div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon" style="background:rgba(255,200,0,0.1);">☁️</div>
+          <div><div class="tech-name">AWS / Cloudflare</div><div class="tech-cat">Infrastructure</div></div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon" style="background:rgba(200,100,255,0.1);">🤖</div>
+          <div><div class="tech-name">AI-Assisted Tools</div><div class="tech-cat">Prototyping</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="glass-card fade-up" style="text-align:center;padding:80px 40px;background:linear-gradient(135deg,rgba(0,212,170,0.06),rgba(124,111,255,0.06));border-color:rgba(0,212,170,0.2);">
+      <h2 style="font-size:clamp(2rem,4vw,3rem);margin-bottom:16px;">Interested in what we're building?</h2>
+      <p style="color:var(--text-muted);max-width:480px;margin:0 auto 40px;">Follow our dev logs, join our community, or reach out directly. We love hearing from other passionate people.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+        <a href="games.html" class="btn btn-primary">Play Our Games</a>
+        <a href="contact.html" class="btn btn-secondary">Contact Us</a>
+        <a href="about.html" class="btn btn-ghost">Meet the Team</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo" style="display:inline-flex;margin-bottom:4px;">
+          <div class="logo-icon"></div>
+          Eclipse Interactive
+        </a>
+        <p>Crafting worlds beyond imagination since 2018.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Games</h5>
+        <a href="game-detail.html?id=1">Aethermoor Chronicles</a>
+        <a href="game-detail.html?id=2">Void Protocol</a>
+        <a href="game-detail.html?id=3">Blackveil</a>
+        <a href="game-detail.html?id=4">Neon Blitz</a>
+      </div>
+      <div class="footer-col">
+        <h5>Studio</h5>
+        <a href="about.html">About Us</a>
+        <a href="studio.html">Our Studio</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <a href="downloads.html">Downloads</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Eclipse Interactive.</span>
+      <span>Made with ◈ in Berlin</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

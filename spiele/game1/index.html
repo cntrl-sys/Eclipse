@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aethermoor Chronicles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f0a04; color: #d4af37; font-family: 'Cinzel', serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+    .bg { position: fixed; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(212,175,55,0.08), transparent), #0f0a04; }
+    .content { position: relative; z-index: 1; text-align: center; max-width: 600px; padding: 40px; }
+    .rune { font-family: serif; font-size: 4rem; opacity: 0.3; margin-bottom: 20px; animation: float 4s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    h1 { font-size: 3rem; margin-bottom: 12px; text-shadow: 0 0 40px rgba(212,175,55,0.5); }
+    .subtitle { font-family: 'IM Fell English', serif; font-style: italic; color: #a0896a; font-size: 1.1rem; margin-bottom: 40px; }
+    .placeholder { font-family: 'IM Fell English', serif; font-style: italic; color: rgba(212,175,55,0.5); margin-bottom: 40px; border: 1px solid rgba(212,175,55,0.2); padding: 20px; border-radius: 8px; }
+    a { display: inline-block; padding: 12px 32px; background: linear-gradient(135deg, #d4af37, #b8960c); color: #0f0a04; text-decoration: none; border-radius: 8px; font-weight: 700; letter-spacing: 0.1em; transition: all 0.3s; }
+    a:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,175,55,0.4); }
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="content">
+    <div class="rune">ᚱᚦᛟ</div>
+    <h1>Aethermoor Chronicles</h1>
+    <p class="subtitle">Fantasy RPG · Eclipse Interactive</p>
+    <div class="placeholder">
+      ⚔ This is a game placeholder.<br>
+      Place your actual game files in <code>spiele/game1/</code><br>
+      and rename this file or replace it with your game's <code>index.html</code>.
+    </div>
+    <a href="../../index.html">← Back to Eclipse Interactive</a>
+  </div>
+</body>
+</html>

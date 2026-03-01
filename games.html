@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Games — Eclipse Interactive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;600;700&family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 8px 22px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-ui);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(124,111,255,0.08);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon"></div>
+    Eclipse Interactive
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="games.html">Games</a></li>
+    <li><a href="downloads.html">Downloads</a></li>
+    <li><a href="studio.html">Studio</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="container" style="position:relative;z-index:2;">
+    <div class="fade-up">
+      <span class="section-label">All Titles</span>
+      <h1 class="section-title">Our Games</h1>
+      <p class="section-sub">Four distinct universes. Infinite hours of play. Pick your world.</p>
+    </div>
+  </div>
+</div>
+
+<section style="padding-top:0;">
+  <div class="container">
+
+    <!-- Filter Bar -->
+    <div class="filter-bar fade-up">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="fantasy">Fantasy</button>
+      <button class="filter-btn" data-filter="scifi">Sci-Fi</button>
+      <button class="filter-btn" data-filter="horror">Horror</button>
+      <button class="filter-btn" data-filter="arcade">Arcade</button>
+    </div>
+
+    <div class="games-grid" id="gamesGrid">
+
+      <!-- FANTASY -->
+      <div class="game-card theme-fantasy fade-up" data-genre="fantasy">
+        <div class="game-card-image">
+          <div class="game-card-image-bg">
+            <div class="fantasy-art">
+              <div class="rune" style="top:5%;left:5%;font-size:3rem;animation-delay:0s">ᚱ</div>
+              <div class="rune" style="top:10%;right:8%;font-size:2rem;animation-delay:-2s">ᚦ</div>
+              <div class="rune" style="bottom:15%;left:12%;font-size:2.5rem;animation-delay:-4s">ᛟ</div>
+              <div class="glow-ring" style="width:200px;height:200px;opacity:0.2"></div>
+              <div class="glow-ring" style="width:120px;height:120px;animation-delay:-2s"></div>
+              <div class="crystal"></div>
+            </div>
+          </div>
+        </div>
+        <div class="game-card-body">
+          <span class="game-genre-tag">Fantasy RPG</span>
+          <h3 class="game-title">Aethermoor Chronicles</h3>
+          <p class="game-desc">A grand epic of sorcery, dragons, and forgotten kingdoms. Carve your destiny in a world of ancient runes and eternal war.</p>
+          <div class="game-card-actions">
+            <a href="spiele/game1/index.html" class="btn btn-sm btn-play theme-fantasy">&#9654; Play</a>
+            <a href="spiele/game1.zip" download="aethermoor.zip" class="btn btn-sm btn-dl theme-fantasy">&#8659; Download</a>
+            <a href="game-detail.html?id=1" class="btn btn-sm btn-ghost theme-fantasy">Details</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCI-FI -->
+      <div class="game-card theme-scifi fade-up" data-genre="scifi">
+        <div class="game-card-image">
+          <div class="game-card-image-bg">
+            <div class="scifi-art">
+              <div class="hex-grid"></div>
+              <div class="scan-line"></div>
+              <div class="core"></div>
+              <div class="orbit o1"></div>
+              <div class="orbit o2"></div>
+              <div class="orbit o3"></div>
+            </div>
+          </div>
+        </div>
+        <div class="game-card-body">
+          <span class="game-genre-tag">Sci-Fi</span>
+          <h3 class="game-title">Void Protocol</h3>
+          <p class="game-desc">Navigate the dying remnants of a galactic empire. Hack, adapt and survive in the cold silence between the stars.</p>
+          <div class="game-card-actions">
+            <a href="spiele/game2/index.html" class="btn btn-sm btn-play theme-scifi">&#9654; Play</a>
+            <a href="spiele/game2.zip" download="void-protocol.zip" class="btn btn-sm btn-dl theme-scifi">&#8659; Download</a>
+            <a href="game-detail.html?id=2" class="btn btn-sm btn-ghost theme-scifi">Details</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- HORROR -->
+      <div class="game-card theme-horror fade-up" data-genre="horror">
+        <div class="game-card-image">
+          <div class="game-card-image-bg">
+            <div class="horror-art">
+              <div class="eye">
+                <div class="eyeball"><div class="pupil"></div></div>
+              </div>
+              <div class="vignette"></div>
+            </div>
+          </div>
+        </div>
+        <div class="game-card-body">
+          <span class="game-genre-tag">Survival Horror</span>
+          <h3 class="game-title">Blackveil</h3>
+          <p class="game-desc">It watches. It waits. It hungers. Survive the night in a crumbling asylum where shadows hunger for your soul.</p>
+          <div class="game-card-actions">
+            <a href="spiele/game3/index.html" class="btn btn-sm btn-play theme-horror">&#9654; Play</a>
+            <a href="spiele/game3.zip" download="blackveil.zip" class="btn btn-sm btn-dl theme-horror">&#8659; Download</a>
+            <a href="game-detail.html?id=3" class="btn btn-sm btn-ghost theme-horror">Details</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARCADE -->
+      <div class="game-card theme-arcade fade-up" data-genre="arcade">
+        <div class="game-card-image">
+          <div class="game-card-image-bg">
+            <div class="arcade-art">
+              <div class="pixel-grid"></div>
+              <div class="stars"></div>
+              <div class="neon-shape"></div>
+              <div class="neon-shape s2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="game-card-body">
+          <span class="game-genre-tag">Arcade</span>
+          <h3 class="game-title">Neon Blitz</h3>
+          <p class="game-desc">Pure speed. Pure chaos. Blast through neon-lit arenas, chain combos, and top the global leaderboard.</p>
+          <div class="game-card-actions">
+            <a href="spiele/game4/index.html" class="btn btn-sm btn-play theme-arcade">&#9654; Play</a>
+            <a href="spiele/game4.zip" download="neon-blitz.zip" class="btn btn-sm btn-dl theme-arcade">&#8659; Download</a>
+            <a href="game-detail.html?id=4" class="btn btn-sm btn-ghost theme-arcade">Details</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Extra game: Fantasy 2 -->
+      <div class="game-card theme-fantasy fade-up" data-genre="fantasy">
+        <div class="game-card-image">
+          <div class="game-card-image-bg">
+            <div class="fantasy-art">
+              <div class="rune" style="top:20%;left:20%;font-size:4rem;animation-delay:-1s">ᚷ</div>
+              <div class="glow-ring" style="width:160px;height:160px;opacity:0.3"></div>
+              <div class="crystal" style="clip-path:polygon(50% 0%, 80% 50%, 50% 100%, 20% 50%);height:80px;width:80px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="game-card-body">
+          <span class="game-genre-tag">Fantasy Strategy</span>
+          <h3 class="game-title">Runebound Empires</h3>
+          <p class="game-desc">Build, conquer, and dominate. Command ancient armies and bend the magical laws of the Runebound continent to your will.</p>
+          <div class="game-card-actions">
+            <a href="spiele/game1/index.html" class="btn btn-sm btn-play theme-fantasy">&#9654; Play</a>
+            <a href="spiele/game1.zip" download="runebound.zip" class="btn btn-sm btn-dl theme-fantasy">&#8659; Download</a>
+            <a href="game-detail.html?id=1" class="btn btn-sm btn-ghost theme-fantasy">Details</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Extra game: Sci-Fi 2 -->
+      <div class="game-card theme-scifi fade-up" data-genre="scifi">
+        <div class="game-card-image">
+          <div class="game-card-image-bg">
+            <div class="scifi-art">
+              <div class="hex-grid"></div>
+              <div class="scan-line" style="animation-duration:2s;"></div>
+              <div class="core" style="width:40px;height:40px;top:30%;left:30%;"></div>
+              <div class="core" style="width:30px;height:30px;top:60%;left:65%;animation-delay:-1s;"></div>
+              <div class="orbit o2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="game-card-body">
+          <span class="game-genre-tag">Sci-Fi Shooter</span>
+          <h3 class="game-title">Sigma Station</h3>
+          <p class="game-desc">A derelict space station. An unknown entity. One survivor. Fight through procedurally generated corridors with zero margin for error.</p>
+          <div class="game-card-actions">
+            <a href="spiele/game2/index.html" class="btn btn-sm btn-play theme-scifi">&#9654; Play</a>
+            <a href="spiele/game2.zip" download="sigma-station.zip" class="btn btn-sm btn-dl theme-scifi">&#8659; Download</a>
+            <a href="game-detail.html?id=2" class="btn btn-sm btn-ghost theme-scifi">Details</a>
+          </div>
+        </div>
+      </div>
+
+  <!-- Extra game: test -->
+      <div class="game-card theme-fantasy fade-up" data-genre="fantasy">
+        <div class="game-card-image">
+          <div class="game-card-image-bg">
+            <div class="fantasy-art">
+              <div class="rune" style="top:20%;left:20%;font-size:4rem;animation-delay:-1s">ᚷ</div>
+              <div class="glow-ring" style="width:160px;height:160px;opacity:0.3"></div>
+              <div class="crystal" style="clip-path:polygon(50% 0%, 80% 50%, 50% 100%, 20% 50%);height:80px;width:80px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="game-card-body">
+          <span class="game-genre-tag">Arena Blade</span>
+          <h3 class="game-title">Arena Combat</h3>
+          <p class="game-desc">Build, conquer, and dominate. Command ancient armies and bend the magical laws of the Runebound continent to your will.</p>
+          <div class="game-card-actions">
+            <a href="spiele/game5/index.html" class="btn btn-sm btn-play theme-fantasy">&#9654; Play</a>
+            <a href="spiele/game5/index.html" download="runebound.zip" class="btn btn-sm btn-dl theme-fantasy">&#8659; Download</a>
+            <a href="game-detail.html?id=5" class="btn btn-sm btn-ghost theme-fantasy">Details</a>
+          </div>
+        </div>
+      </div>
+
+       <!-- magical arena -->
+       <div class="game-card theme-arcade fade-up" data-genre="arcade">
+            <div class="game-card-image">
+              <div class="game-card-image-bg">
+                <div class="arcade-art">
+                  <div class="pixel-grid"></div>
+                  <div class="stars"></div>
+                  <div class="neon-shape"></div>
+                  <div class="neon-shape s2"></div>
+                </div>
+              </div>
+            </div>
+            <div class="game-card-body">
+              <span class="game-genre-tag">Arena Blade</span>
+              <h3 class="game-title">Magical Arena</h3>
+              <p class="game-desc">Pure speed. Pure chaos. Blast through neon-lit arenas, chain combos, and top the global leaderboard.</p>
+              <div class="game-card-actions">
+                <a href="spiele/game6/index.html" class="btn btn-sm btn-play theme-arcade">&#9654; Play</a>
+                <a href="spiele/game6.zip" download="neon-blitz.zip" class="btn btn-sm btn-dl theme-arcade">&#8659; Download</a>
+                <a href="game-detail.html?id6" class="btn btn-sm btn-ghost theme-arcade">Details</a>
+              </div>
+            </div>
+          </div>
+
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo" style="display:inline-flex;margin-bottom:4px;">
+          <div class="logo-icon"></div>
+          Eclipse Interactive
+        </a>
+        <p>Crafting worlds beyond imagination since 2018.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Games</h5>
+        <a href="game-detail.html?id=1">Aethermoor Chronicles</a>
+        <a href="game-detail.html?id=2">Void Protocol</a>
+        <a href="game-detail.html?id=3">Blackveil</a>
+        <a href="game-detail.html?id=4">Neon Blitz</a>
+      </div>
+      <div class="footer-col">
+        <h5>Studio</h5>
+        <a href="about.html">About Us</a>
+        <a href="studio.html">Our Studio</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <a href="downloads.html">Downloads</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Eclipse Interactive.</span>
+      <span>Made with ◈ in Berlin</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+  // Filter logic
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.game-card[data-genre]');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      cards.forEach(card => {
+        const match = filter === 'all' || card.dataset.genre === filter;
+        card.style.display = match ? '' : 'none';
+      });
+    });
+  });
+</script>
+</body>
+</html>

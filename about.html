@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — Eclipse Interactive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Orbitron:wght@400;600;700&family=Rajdhani:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .timeline { position: relative; padding-left: 40px; }
+    .timeline::before { content:''; position:absolute; left:8px; top:0; bottom:0; width:2px; background:linear-gradient(180deg, var(--accent), transparent); }
+    .timeline-item { position:relative; margin-bottom:40px; }
+    .timeline-item::before { content:''; position:absolute; left:-36px; top:6px; width:12px; height:12px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); }
+    .timeline-year { font-family:var(--font-display); font-size:0.8rem; color:var(--accent); letter-spacing:0.15em; margin-bottom:6px; }
+    .timeline-title { font-family:var(--font-display); font-size:1.1rem; margin-bottom:8px; }
+    .timeline-desc { font-size:0.9rem; color:var(--text-muted); line-height:1.6; }
+    .value-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:32px; transition:all var(--transition); }
+    .value-card:hover { border-color:var(--accent); transform:translateY(-4px); background:var(--surface2); }
+    .value-icon { font-size:2rem; margin-bottom:16px; }
+    .value-title { font-family:var(--font-display); font-size:1.1rem; margin-bottom:8px; }
+    .value-desc { font-size:0.875rem; color:var(--text-muted); line-height:1.6; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon"></div>
+    Eclipse Interactive
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="games.html">Games</a></li>
+    <li><a href="downloads.html">Downloads</a></li>
+    <li><a href="studio.html">Studio</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="container" style="position:relative;z-index:2;">
+    <div class="fade-up">
+      <span class="section-label">Eclipse Interactive</span>
+      <h1 class="section-title">About Us</h1>
+      <p class="section-sub">We are storytellers, world-builders, and players first. Every game we make starts with a single question: what would make us forget to sleep?</p>
+    </div>
+  </div>
+</div>
+
+<section style="padding-top:0;">
+  <div class="container">
+
+    <!-- Mission -->
+    <div class="glass-card fade-up" style="margin-bottom:80px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;">
+      <div>
+        <span class="section-label">Our Mission</span>
+        <h2 style="font-size:2.2rem;margin:16px 0 20px;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Make games that<br>actually matter.</h2>
+        <p style="color:var(--text-muted);line-height:1.9;margin-bottom:20px;">In an industry saturated with sequels and safe bets, Eclipse Interactive exists to prove that small teams can make profound games. We take risks, we experiment, we fail — and we ship anyway, because we believe every imperfect game that tries something new is worth a thousand polished mediocre ones.</p>
+        <p style="color:var(--text-muted);line-height:1.9;">We make games for the player who lost an entire weekend to a title they can't stop thinking about — and we make sure our games earn that dedication.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="value-card">
+          <div class="value-icon">⚔️</div>
+          <div class="value-title">Courage</div>
+          <div class="value-desc">We take creative risks others won't.</div>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🔮</div>
+          <div class="value-title">Craft</div>
+          <div class="value-desc">Every detail matters. Every pixel counts.</div>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🌍</div>
+          <div class="value-title">Community</div>
+          <div class="value-desc">Players shape what we build.</div>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🚀</div>
+          <div class="value-title">Innovation</div>
+          <div class="value-desc">We find new ways to tell old stories.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Studio Stats -->
+    <div class="studio-stats fade-up" style="margin-bottom:80px;">
+      <div class="studio-stat">
+        <div class="studio-stat-num" data-count="4" data-suffix="">4</div>
+        <div class="studio-stat-label">Games Shipped</div>
+      </div>
+      <div class="studio-stat">
+        <div class="studio-stat-num" data-count="280000" data-suffix="">0</div>
+        <div class="studio-stat-label">Active Players</div>
+      </div>
+      <div class="studio-stat">
+        <div class="studio-stat-num" data-count="5" data-suffix="">5</div>
+        <div class="studio-stat-label">Awards Won</div>
+      </div>
+      <div class="studio-stat">
+        <div class="studio-stat-num" data-count="6" data-suffix="">6</div>
+        <div class="studio-stat-label">Years of Making</div>
+      </div>
+    </div>
+
+    <!-- Team -->
+    <div class="fade-up" style="margin-bottom:80px;">
+      <span class="section-label">The People</span>
+      <h2 class="section-title" style="margin-bottom:16px;">Meet the Team</h2>
+      <p class="section-sub">Seven humans who eat, breathe, and dream games.</p>
+
+      <div class="team-grid">
+        <div class="team-card fade-up">
+          <div class="team-avatar" style="background:linear-gradient(135deg,rgba(124,111,255,0.2),rgba(168,85,247,0.2));">🎮</div>
+          <div class="team-name">Soren Keller</div>
+          <div class="team-role">Creative Director</div>
+          <div class="team-bio">The visionary. Soren founded Eclipse with a dog-eared notebook full of game ideas and an unhealthy obsession with mythology.</div>
+        </div>
+        <div class="team-card fade-up">
+          <div class="team-avatar" style="background:linear-gradient(135deg,rgba(0,212,170,0.2),rgba(0,180,255,0.2));">💻</div>
+          <div class="team-name">Mia Hoffmann</div>
+          <div class="team-role">Lead Engineer</div>
+          <div class="team-bio">Mia ships code faster than most people read it. She's kept every engine running since day one.</div>
+        </div>
+        <div class="team-card fade-up">
+          <div class="team-avatar" style="background:linear-gradient(135deg,rgba(212,175,55,0.2),rgba(200,100,0,0.2));">🎨</div>
+          <div class="team-name">Lena Braun</div>
+          <div class="team-role">Art Director</div>
+          <div class="team-bio">Every visual you love in our games came from Lena's brain first. Her aesthetic is utterly singular.</div>
+        </div>
+        <div class="team-card fade-up">
+          <div class="team-avatar" style="background:linear-gradient(135deg,rgba(255,107,107,0.2),rgba(200,0,0,0.2));">🎵</div>
+          <div class="team-name">Axel Müller</div>
+          <div class="team-role">Audio Director</div>
+          <div class="team-bio">Axel creates sonic worlds so immersive players forget they're wearing headphones.</div>
+        </div>
+        <div class="team-card fade-up">
+          <div class="team-avatar" style="background:linear-gradient(135deg,rgba(255,0,200,0.2),rgba(100,0,255,0.2));">✍️</div>
+          <div class="team-name">Clara Fischer</div>
+          <div class="team-role">Narrative Designer</div>
+          <div class="team-bio">Clara's stories have made grown adults cry at 3am. She considers this a professional achievement.</div>
+        </div>
+        <div class="team-card fade-up">
+          <div class="team-avatar" style="background:linear-gradient(135deg,rgba(0,255,200,0.2),rgba(0,100,200,0.2));">🕹️</div>
+          <div class="team-name">Tom Weber</div>
+          <div class="team-role">Game Designer</div>
+          <div class="team-bio">Tom is the reason our games feel immediately intuitive and endlessly deep. He lives for the moment it clicks.</div>
+        </div>
+        <div class="team-card fade-up">
+          <div class="team-avatar" style="background:linear-gradient(135deg,rgba(200,150,0,0.2),rgba(100,50,200,0.2));">🌐</div>
+          <div class="team-name">Nina Schulz</div>
+          <div class="team-role">Producer</div>
+          <div class="team-bio">Nina ensures we actually ship the games we dream about. Without her, we'd still be "almost done".</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;margin-bottom:80px;">
+      <div class="fade-up">
+        <span class="section-label">History</span>
+        <h2 class="section-title" style="margin-bottom:40px;">Our Journey</h2>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-year">2018</div>
+            <div class="timeline-title">The Beginning</div>
+            <div class="timeline-desc">Three friends, a shared apartment in Berlin, and a dream. Eclipse Interactive is founded. Neon Blitz, our first game, ships in November.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2019</div>
+            <div class="timeline-title">First Recognition</div>
+            <div class="timeline-desc">Neon Blitz wins "Best Debut" at the German Indie Game Awards. The team grows to 5. We begin work on Aethermoor Chronicles.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2021</div>
+            <div class="timeline-title">Aethermoor Launches</div>
+            <div class="timeline-desc">Our most ambitious project ships after 2 years of development. 50,000 downloads in the first week. We cry. A lot.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2022</div>
+            <div class="timeline-title">Going Galactic</div>
+            <div class="timeline-desc">Void Protocol launches to rave reviews, winning "Best Narrative" at IndieCraft. We hit 200K total players.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2023</div>
+            <div class="timeline-title">Into the Dark</div>
+            <div class="timeline-desc">Blackveil ships. Nothing is the same. The horror community adopts us. We are simultaneously delighted and terrified.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2024 →</div>
+            <div class="timeline-title">What's Next</div>
+            <div class="timeline-desc">Two new projects in development. One we can't talk about. One we're calling "the biggest thing we've ever done."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fade-up" style="padding-top:80px;">
+        <div class="glass-card" style="margin-bottom:24px;">
+          <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:16px;color:var(--accent);">Press &amp; Awards</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="padding:12px;background:var(--surface);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-size:0.85rem;color:var(--text);font-weight:600;">🏆 Best Debut — GAA 2019</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">German Independent Game Awards</div>
+            </div>
+            <div style="padding:12px;background:var(--surface);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-size:0.85rem;color:var(--text);font-weight:600;">🏆 Best Narrative — IndieCraft 2022</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">European Indie Game Conference</div>
+            </div>
+            <div style="padding:12px;background:var(--surface);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-size:0.85rem;color:var(--text);font-weight:600;">🏆 Most Immersive — HorrorCon 2023</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">International Horror Game Convention</div>
+            </div>
+            <div style="padding:12px;background:var(--surface);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-size:0.85rem;color:var(--text);font-weight:600;">🏆 Audience Award — GameDev Summit 2023</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Annual Developer Summit, Berlin</div>
+            </div>
+            <div style="padding:12px;background:var(--surface);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-size:0.85rem;color:var(--text);font-weight:600;">🏆 Best Art Direction — PixelPulse 2024</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">International Indie Showcase</div>
+            </div>
+          </div>
+        </div>
+        <div class="glass-card">
+          <h3 style="font-family:var(--font-display);font-size:1.1rem;margin-bottom:16px;">Want to work with us?</h3>
+          <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:20px;line-height:1.6;">We're always looking for passionate people who want to build worlds. Drop us a line.</p>
+          <a href="contact.html" class="btn btn-primary" style="width:100%;justify-content:center;">Get in Touch →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo" style="display:inline-flex;margin-bottom:4px;">
+          <div class="logo-icon"></div>
+          Eclipse Interactive
+        </a>
+        <p>Crafting worlds beyond imagination since 2018.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Games</h5>
+        <a href="game-detail.html?id=1">Aethermoor Chronicles</a>
+        <a href="game-detail.html?id=2">Void Protocol</a>
+        <a href="game-detail.html?id=3">Blackveil</a>
+        <a href="game-detail.html?id=4">Neon Blitz</a>
+      </div>
+      <div class="footer-col">
+        <h5>Studio</h5>
+        <a href="about.html">About Us</a>
+        <a href="studio.html">Our Studio</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <a href="downloads.html">Downloads</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Eclipse Interactive.</span>
+      <span>Made with ◈ in Berlin</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

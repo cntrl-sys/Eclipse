@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — Eclipse Interactive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .contact-form { display: flex; flex-direction: column; gap: 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-label { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+    .form-input, .form-textarea, .form-select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: var(--text);
+      font-family: var(--font-ui);
+      font-size: 0.95rem;
+      transition: all var(--transition);
+      outline: none;
+      width: 100%;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--accent);
+      background: var(--surface2);
+      box-shadow: 0 0 0 3px rgba(124,111,255,0.15);
+    }
+    .form-textarea { resize: vertical; min-height: 140px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-select option { background: #0d0f17; color: var(--text); }
+    .contact-info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: all var(--transition);
+    }
+    .contact-info-card:hover { border-color: var(--accent); background: var(--surface2); }
+    .contact-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; background: rgba(124,111,255,0.1); }
+    .success-msg { display: none; background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.3); border-radius: var(--radius); padding: 20px 24px; color: #00d4aa; text-align: center; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon"></div>
+    Eclipse Interactive
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="games.html">Games</a></li>
+    <li><a href="downloads.html">Downloads</a></li>
+    <li><a href="studio.html">Studio</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-bg" style="background:radial-gradient(ellipse 60% 80% at 50% 0%, rgba(255,107,107,0.08), transparent);"></div>
+  <div class="container" style="position:relative;z-index:2;">
+    <div class="fade-up">
+      <span class="section-label">Get In Touch</span>
+      <h1 class="section-title">Contact Us</h1>
+      <p class="section-sub">Press inquiries, partnerships, job applications, or just a message from a fan — we read everything.</p>
+    </div>
+  </div>
+</div>
+
+<section style="padding-top:0;">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:60px;align-items:start;">
+
+      <!-- Form -->
+      <div class="glass-card fade-up">
+        <h2 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:8px;">Send a Message</h2>
+        <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:32px;">We typically respond within 1–2 business days.</p>
+
+        <div id="successMsg" class="success-msg">
+          ✓ Message sent! We'll get back to you soon.
+        </div>
+
+        <div class="contact-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input class="form-input" type="text" placeholder="Soren" id="firstName">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input class="form-input" type="text" placeholder="Keller" id="lastName">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input class="form-input" type="email" placeholder="you@example.com" id="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <select class="form-select" id="subject">
+              <option value="">Select a topic...</option>
+              <option>Press Inquiry</option>
+              <option>Partnership / Collaboration</option>
+              <option>Job Application</option>
+              <option>Bug Report</option>
+              <option>Fan Mail / General</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-textarea" placeholder="Tell us what's on your mind..." id="message"></textarea>
+          </div>
+          <button class="btn btn-primary" id="submitBtn" onclick="handleSubmit()" style="width:fit-content;">
+            Send Message →
+          </button>
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="fade-up" style="display:flex;flex-direction:column;gap:16px;padding-top:20px;">
+        <div class="contact-info-card">
+          <div class="contact-icon">📧</div>
+          <div>
+            <div style="font-weight:700;margin-bottom:4px;">General Inquiries</div>
+            <div style="font-size:0.875rem;color:var(--text-muted);">hello@eclipse-interactive.dev</div>
+          </div>
+        </div>
+        <div class="contact-info-card">
+          <div class="contact-icon">📰</div>
+          <div>
+            <div style="font-weight:700;margin-bottom:4px;">Press</div>
+            <div style="font-size:0.875rem;color:var(--text-muted);">press@eclipse-interactive.dev</div>
+          </div>
+        </div>
+        <div class="contact-info-card">
+          <div class="contact-icon">💼</div>
+          <div>
+            <div style="font-weight:700;margin-bottom:4px;">Jobs</div>
+            <div style="font-size:0.875rem;color:var(--text-muted);">jobs@eclipse-interactive.dev</div>
+          </div>
+        </div>
+        <div class="contact-info-card">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div style="font-weight:700;margin-bottom:4px;">Studio Location</div>
+            <div style="font-size:0.875rem;color:var(--text-muted);">Bergmannstraße 12<br>10961 Berlin, Germany</div>
+          </div>
+        </div>
+
+        <div class="glass-card" style="margin-top:8px;padding:28px;">
+          <h4 style="font-family:var(--font-display);font-size:1rem;margin-bottom:16px;color:var(--accent);">Community</h4>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="#" style="display:flex;align-items:center;gap:10px;font-size:0.875rem;color:var(--text-muted);transition:var(--transition);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">
+              <span style="width:28px;height:28px;background:rgba(124,111,255,0.1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;">💬</span>
+              Join our Discord Server
+            </a>
+            <a href="#" style="display:flex;align-items:center;gap:10px;font-size:0.875rem;color:var(--text-muted);transition:var(--transition);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">
+              <span style="width:28px;height:28px;background:rgba(0,180,255,0.1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;">🐦</span>
+              Follow on Twitter / X
+            </a>
+            <a href="#" style="display:flex;align-items:center;gap:10px;font-size:0.875rem;color:var(--text-muted);transition:var(--transition);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">
+              <span style="width:28px;height:28px;background:rgba(255,100,0,0.1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;">🎮</span>
+              Visit our itch.io Page
+            </a>
+            <a href="#" style="display:flex;align-items:center;gap:10px;font-size:0.875rem;color:var(--text-muted);transition:var(--transition);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">
+              <span style="width:28px;height:28px;background:rgba(0,200,100,0.1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;">📹</span>
+              YouTube Dev Channel
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo" style="display:inline-flex;margin-bottom:4px;">
+          <div class="logo-icon"></div>
+          Eclipse Interactive
+        </a>
+        <p>We respond to every message. Promise.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Games</h5>
+        <a href="game-detail.html?id=1">Aethermoor Chronicles</a>
+        <a href="game-detail.html?id=2">Void Protocol</a>
+        <a href="game-detail.html?id=3">Blackveil</a>
+        <a href="game-detail.html?id=4">Neon Blitz</a>
+      </div>
+      <div class="footer-col">
+        <h5>Studio</h5>
+        <a href="about.html">About Us</a>
+        <a href="studio.html">Our Studio</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <a href="downloads.html">Downloads</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Eclipse Interactive.</span>
+      <span>Made with ◈ in Berlin</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+function handleSubmit() {
+  const firstName = document.getElementById('firstName').value;
+  const email = document.getElementById('email').value;
+  const subject = document.getElementById('subject').value;
+  const message = document.getElementById('message').value;
+  if (!firstName || !email || !subject || !message) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
+  setTimeout(() => {
+    document.querySelector('.contact-form').style.display = 'none';
+    const msg = document.getElementById('successMsg');
+    msg.style.display = 'block';
+    msg.textContent = `✓ Thanks, ${firstName}! Message sent. We'll be in touch soon.`;
+  }, 1200);
+}
+</script>
+</body>
+</html>

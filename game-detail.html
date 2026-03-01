@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Detail — Eclipse Interactive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;600;700&family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon"></div>
+    Eclipse Interactive
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="games.html">Games</a></li>
+    <li><a href="downloads.html">Downloads</a></li>
+    <li><a href="studio.html">Studio</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <div class="nav-hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- DYNAMIC DETAIL HERO -->
+<div class="detail-hero" id="detailHero">
+  <div class="detail-hero-bg" id="detailBg"></div>
+  <div class="detail-hero-overlay"></div>
+  <div class="container" style="position:relative;z-index:2;width:100%;">
+    <div class="detail-hero-content">
+      <a href="games.html" style="display:inline-flex;align-items:center;gap:8px;color:var(--text-muted);font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:24px;transition:var(--transition);"
+         onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">
+        ← Back to Games
+      </a>
+      <span class="section-label" id="detailGenre">Loading...</span>
+      <h1 id="detailTitle" style="font-size:clamp(3rem,7vw,6rem);margin:16px 0 24px;"></h1>
+      <p id="detailTagline" style="font-size:1.15rem;color:var(--text-muted);max-width:560px;margin-bottom:36px;line-height:1.7;"></p>
+      <div id="detailActions" style="display:flex;gap:16px;flex-wrap:wrap;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL CONTENT -->
+<div class="container">
+  <div class="detail-content" id="detailContent">
+    <div>
+      <div class="fade-up">
+        <h3 style="font-size:1.5rem;margin-bottom:20px;">About This Game</h3>
+        <p id="detailDesc" style="color:var(--text-muted);line-height:1.9;margin-bottom:40px;"></p>
+      </div>
+      <div class="fade-up">
+        <h3 style="font-size:1.5rem;margin-bottom:20px;">Key Features</h3>
+        <ul class="detail-features" id="detailFeatures"></ul>
+      </div>
+    </div>
+    <div class="detail-sidebar">
+      <div class="detail-card fade-up">
+        <h4>Game Info</h4>
+        <div id="detailMeta" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+      <div class="detail-card fade-up" id="detailSideActions" style="display:flex;flex-direction:column;gap:12px;"></div>
+    </div>
+  </div>
+
+  <!-- Screenshots -->
+  <div class="fade-up" style="padding-bottom:100px;">
+    <h3 style="font-size:1.5rem;margin-bottom:28px;">Screenshots</h3>
+    <div class="screenshots-grid" id="screenshots"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo" style="display:inline-flex;margin-bottom:4px;">
+          <div class="logo-icon"></div>
+          Eclipse Interactive
+        </a>
+        <p>Crafting worlds beyond imagination since 2018.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Games</h5>
+        <a href="game-detail.html?id=1">Aethermoor Chronicles</a>
+        <a href="game-detail.html?id=2">Void Protocol</a>
+        <a href="game-detail.html?id=3">Blackveil</a>
+        <a href="game-detail.html?id=4">Neon Blitz</a>
+      </div>
+      <div class="footer-col">
+        <h5>Studio</h5>
+        <a href="about.html">About Us</a>
+        <a href="studio.html">Our Studio</a>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <a href="downloads.html">Downloads</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Eclipse Interactive.</span>
+      <span>Made with ◈ in Berlin</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+const games = {
+  1: {
+    title: 'Aethermoor Chronicles',
+    genre: 'Fantasy RPG',
+    tagline: 'An epic of sorcery, dragons and forgotten kingdoms awaits.',
+    desc: 'Aethermoor Chronicles is a sprawling open-world fantasy RPG set in a realm torn between ancient magic and the ambitions of mortal kings. You play as a wandering Runebound — a warrior cursed with the ability to absorb the souls of fallen enemies and wield their powers. From the icy peaks of Dravenspire to the cursed swamps of Ebonmere, every corner of Aethermoor holds secrets, dangers, and rewards for the bold. With over 40 hours of main story content and dozens of side quests, the Chronicles will test your resolve, your wit, and your blade.',
+    features: ['Open world with 6 distinct biomes', '12 unique character classes', 'Dynamic weather and day/night cycle', 'Over 200 craftable items', 'Fully voiced main story quest line', 'Co-op multiplayer for up to 4 players'],
+    meta: { Developer: 'Eclipse Interactive', Genre: 'Fantasy RPG', Platform: 'Browser / Windows', Version: '2.1.0', Release: '2022' },
+    play: 'spiele/game1/index.html',
+    dl: 'spiele/game1.zip',
+    dlname: 'aethermoor.zip',
+    bg: 'linear-gradient(135deg, #3d1f00 0%, #1a0a00 40%, #2d1500 100%)',
+    accent: '#d4af37',
+    titleFont: "'Cinzel', serif",
+    screenshotColors: ['#2d1f0a','#1a1208','#3d2a0f','#2a1a06'],
+  },
+  2: {
+    title: 'Void Protocol',
+    genre: 'Sci-Fi',
+    tagline: 'The empire is dying. The void is hungry. Survive.',
+    desc: 'Void Protocol drops you into the ruins of the Kalindra Empire, a once-mighty interstellar civilization now crumbling under the weight of a mysterious signal broadcast from the edge of known space. As Commander Elara Voss, you command a salvaged warship and a crew of desperate survivors, navigating treacherous space lanes, forming uneasy alliances, and uncovering the truth about the Void — an entity that doesn\'t just destroy, it unmakes. A blend of tactical combat, deep lore, and branching narrative decisions, Void Protocol delivers an experience that rewards every playthrough differently.',
+    features: ['Branching story with 6 unique endings', 'Real-time tactical space combat', 'Ship customization with 80+ modules', 'Procedural mission generation', 'Crew management and morale system', 'Online leaderboards'],
+    meta: { Developer: 'Eclipse Interactive', Genre: 'Sci-Fi Strategy', Platform: 'Browser / Windows', Version: '1.4.2', Release: '2023' },
+    play: 'spiele/game2/index.html',
+    dl: 'spiele/game2.zip',
+    dlname: 'void-protocol.zip',
+    bg: 'linear-gradient(135deg, #020b14 0%, #010810 50%, #030f1a 100%)',
+    accent: '#00b4ff',
+    titleFont: "'Orbitron', monospace",
+    screenshotColors: ['#020b14','#041525','#020d1e','#030c18'],
+  },
+  3: {
+    title: 'Blackveil',
+    genre: 'Survival Horror',
+    tagline: 'It is already inside. There is no escape.',
+    desc: 'Blackveil is a first-person psychological horror experience set in the Ravensworth Asylum, shuttered in 1987 after a series of inexplicable events left its staff dead and its patients missing. You are Dr. Mira Elston, a paranormal investigator hired to catalogue the ruins. What you find defies explanation. Blackveil uses dynamic fear mechanics — the longer you stay in darkness, the more the entity adapts to your behaviour. There are no weapons. No combat. Only your wits, your flashlight, and the desperate hope that some doors, when closed, should never be reopened.',
+    features: ['Dynamic adaptive AI that learns your playstyle', 'Purely atmospheric — no weapons or combat', 'Fully 3D audio environment', 'Multiple narrative endings', 'Unlockable nightmare mode', 'Real-time sanity system that distorts the environment'],
+    meta: { Developer: 'Eclipse Interactive', Genre: 'Survival Horror', Platform: 'Browser / Windows', Version: '1.0.5', Release: '2023' },
+    play: 'spiele/game3/index.html',
+    dl: 'spiele/game3.zip',
+    dlname: 'blackveil.zip',
+    bg: 'linear-gradient(135deg, #1a0505 0%, #0d0202 50%, #150404 100%)',
+    accent: '#cc2222',
+    titleFont: "'UnifrakturMaguntia', cursive",
+    screenshotColors: ['#150404','#0d0202','#1a0505','#0a0101'],
+  },
+  4: {
+    title: 'Neon Blitz',
+    genre: 'Arcade Shooter',
+    tagline: 'No rules. All neon. Maximum chaos.',
+    desc: 'Neon Blitz is an unashamedly frantic arcade twin-stick shooter that wears its retro inspirations on its sleeve while delivering a thoroughly modern experience. Set in the hyper-stylized grid universe of GRID-9, you pilot a customizable neon ship against endless waves of geometric enemies, building insane combo chains and unleashing screen-clearing super blasts. With a pumping synthwave soundtrack, procedurally generated level layouts, and a competitive global leaderboard, Neon Blitz is the perfect pick-up-and-play experience for those who believe more is always more.',
+    features: ['Endless arcade mode with online leaderboards', '40+ unlockable ship skins', 'Daily challenge modes', 'Synthwave soundtrack with 14 tracks', '2-player local co-op', 'Steam achievements (60 total)'],
+    meta: { Developer: 'Eclipse Interactive', Genre: 'Arcade / Shooter', Platform: 'Browser / Windows', Version: '3.2.1', Release: '2021' },
+    play: 'spiele/game4/index.html',
+    dl: 'spiele/game4.zip',
+    dlname: 'neon-blitz.zip',
+    bg: 'linear-gradient(135deg, #0a0015 0%, #060010 50%, #100020 100%)',
+    accent: '#ff00cc',
+    titleFont: "'Bebas Neue', sans-serif",
+    screenshotColors: ['#0a0015','#060010','#0f001f','#08001a'],
+  },
+   5: {
+    title: 'Arena Comabt',
+    genre: 'Arena Blade',
+    tagline: 'An epic of sorcery, dragons and forgotten kingdoms awaits.',
+    desc: 'Aethermoor Chronicles is a sprawling open-world fantasy RPG set in a realm torn between ancient magic and the ambitions of mortal kings. You play as a wandering Runebound — a warrior cursed with the ability to absorb the souls of fallen enemies and wield their powers. From the icy peaks of Dravenspire to the cursed swamps of Ebonmere, every corner of Aethermoor holds secrets, dangers, and rewards for the bold. With over 40 hours of main story content and dozens of side quests, the Chronicles will test your resolve, your wit, and your blade.',
+    features: ['Open world with 6 distinct biomes', '12 unique character classes', 'Dynamic weather and day/night cycle', 'Over 200 craftable items', 'Fully voiced main story quest line', 'Co-op multiplayer for up to 4 players'],
+    meta: { Developer: 'Eclipse Interactive', Genre: 'Fantasy RPG', Platform: 'Browser / Windows', Version: '2.1.0', Release: '2022' },
+    play: 'spiele/game5/index.html',
+    dl: 'spiele/game5.zip',
+    dlname: 'aethermoor.zip',
+    bg: 'linear-gradient(135deg, #3d1f00 0%, #1a0a00 40%, #2d1500 100%)',
+    accent: '#d4af37',
+    titleFont: "'Cinzel', serif",
+    screenshotColors: ['#2d1f0a','#1a1208','#3d2a0f','#2a1a06'],
+  },
+  4: {
+    title: 'Magical Arena',
+    genre: 'Arena Blade',
+    tagline: 'No rules. All neon. Maximum chaos.',
+    desc: 'Neon Blitz is an unashamedly frantic arcade twin-stick shooter that wears its retro inspirations on its sleeve while delivering a thoroughly modern experience. Set in the hyper-stylized grid universe of GRID-9, you pilot a customizable neon ship against endless waves of geometric enemies, building insane combo chains and unleashing screen-clearing super blasts. With a pumping synthwave soundtrack, procedurally generated level layouts, and a competitive global leaderboard, Neon Blitz is the perfect pick-up-and-play experience for those who believe more is always more.',
+    features: ['Endless arcade mode with online leaderboards', '40+ unlockable ship skins', 'Daily challenge modes', 'Synthwave soundtrack with 14 tracks', '2-player local co-op', 'Steam achievements (60 total)'],
+    meta: { Developer: 'Eclipse Interactive', Genre: 'Arcade / Shooter', Platform: 'Browser / Windows', Version: '3.2.1', Release: '2021' },
+    play: 'spiele/game6/index.html',
+    dl: 'spiele/game6.zip',
+    dlname: 'neon-blitz.zip',
+    bg: 'linear-gradient(135deg, #0a0015 0%, #060010 50%, #100020 100%)',
+    accent: '#ff00cc',
+    titleFont: "'Bebas Neue', sans-serif",
+    screenshotColors: ['#0a0015','#060010','#0f001f','#08001a'],
+  }
+};
+
+function metaRow(label, value) {
+  return `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding:8px 0;font-size:0.875rem;">
+    <span style="color:var(--text-muted)">${label}</span>
+    <span style="color:var(--text);font-weight:600">${value}</span>
+  </div>`;
+}
+
+function screenshotBg(color, accent, i) {
+  const patterns = [
+    `radial-gradient(ellipse 60% 60% at 30% 40%, ${accent}22, transparent), linear-gradient(135deg, ${color}, #000)`,
+    `radial-gradient(ellipse 40% 60% at 70% 60%, ${accent}18, transparent), linear-gradient(45deg, ${color}, #050505)`,
+    `linear-gradient(180deg, ${color}, #000 70%), radial-gradient(circle at 50% 0%, ${accent}22, transparent)`,
+    `radial-gradient(ellipse 80% 40% at 50% 80%, ${accent}15, transparent), ${color}`,
+  ];
+  return patterns[i % 4];
+}
+
+function loadGame() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id') || 1;
+  const g = games[id];
+  if (!g) return;
+
+  document.title = `${g.title} — Eclipse Interactive`;
+  document.getElementById('detailBg').style.background = g.bg;
+  document.getElementById('detailGenre').textContent = g.genre;
+
+  const titleEl = document.getElementById('detailTitle');
+  titleEl.textContent = g.title;
+  titleEl.style.fontFamily = g.titleFont;
+  titleEl.style.color = g.accent;
+  titleEl.style.textShadow = `0 0 60px ${g.accent}66`;
+
+  document.getElementById('detailTagline').textContent = g.tagline;
+  document.getElementById('detailDesc').textContent = g.desc;
+
+  document.getElementById('detailActions').innerHTML = `
+    <a href="${g.play}" class="btn btn-primary" style="background:linear-gradient(135deg,${g.accent},${g.accent}99);box-shadow:0 4px 24px ${g.accent}44;">&#9654; Play Now</a>
+    <a href="${g.dl}" download="${g.dlname}" class="btn btn-secondary">&#8659; Download</a>
+    <a href="games.html" class="btn btn-ghost">All Games</a>
+  `;
+
+  const features = document.getElementById('detailFeatures');
+  g.features.forEach(f => {
+    const li = document.createElement('li');
+    li.textContent = f;
+    features.appendChild(li);
+  });
+
+  const meta = document.getElementById('detailMeta');
+  meta.innerHTML = Object.entries(g.meta).map(([k,v]) => metaRow(k,v)).join('');
+
+  document.getElementById('detailSideActions').innerHTML = `
+    <a href="${g.play}" class="btn btn-primary" style="background:linear-gradient(135deg,${g.accent},${g.accent}99);text-align:center;">&#9654; Play Now</a>
+    <a href="${g.dl}" download="${g.dlname}" class="btn btn-secondary" style="text-align:center;">&#8659; Download Free</a>
+  `;
+
+  const ss = document.getElementById('screenshots');
+  for (let i = 0; i < 4; i++) {
+    const div = document.createElement('div');
+    div.className = 'screenshot';
+    div.style.cssText = `aspect-ratio:16/9;background:${screenshotBg(g.screenshotColors[i], g.accent, i)};display:flex;align-items:center;justify-content:center;`;
+    div.innerHTML = `<span style="font-family:${g.titleFont};color:${g.accent}33;font-size:1.2rem;letter-spacing:0.2em;">SCREENSHOT ${i+1}</span>`;
+    ss.appendChild(div);
+  }
+}
+
+loadGame();
+</script>
+</body>
+</html>

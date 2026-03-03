@@ -4,33 +4,1299 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aethermoor Chronicles</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --gold: #d4af37;
+      --gold-dim: #a0896a;
+      --gold-dark: #6b5c2e;
+      --bg: #0a0704;
+      --bg2: #110d06;
+      --bg3: #1a1208;
+      --red: #8b1a1a;
+      --red-bright: #c0392b;
+      --blue: #1a3a5c;
+      --blue-bright: #2980b9;
+      --green: #1a4a1a;
+      --green-bright: #27ae60;
+      --text: #e8d5a3;
+      --text-dim: #8a7a5a;
+      --border: rgba(212,175,55,0.2);
+      --border-bright: rgba(212,175,55,0.5);
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0f0a04; color: #d4af37; font-family: 'Cinzel', serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-    .bg { position: fixed; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(212,175,55,0.08), transparent), #0f0a04; }
-    .content { position: relative; z-index: 1; text-align: center; max-width: 600px; padding: 40px; }
-    .rune { font-family: serif; font-size: 4rem; opacity: 0.3; margin-bottom: 20px; animation: float 4s ease-in-out infinite; }
-    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-    h1 { font-size: 3rem; margin-bottom: 12px; text-shadow: 0 0 40px rgba(212,175,55,0.5); }
-    .subtitle { font-family: 'IM Fell English', serif; font-style: italic; color: #a0896a; font-size: 1.1rem; margin-bottom: 40px; }
-    .placeholder { font-family: 'IM Fell English', serif; font-style: italic; color: rgba(212,175,55,0.5); margin-bottom: 40px; border: 1px solid rgba(212,175,55,0.2); padding: 20px; border-radius: 8px; }
-    a { display: inline-block; padding: 12px 32px; background: linear-gradient(135deg, #d4af37, #b8960c); color: #0f0a04; text-decoration: none; border-radius: 8px; font-weight: 700; letter-spacing: 0.1em; transition: all 0.3s; }
-    a:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,175,55,0.4); }
+    
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IM Fell English', serif;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Animated BG ── */
+    .bg-layer {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 30% 60%, rgba(139,26,26,0.07), transparent),
+        radial-gradient(ellipse 50% 60% at 70% 40%, rgba(26,58,92,0.07), transparent),
+        radial-gradient(ellipse 80% 80% at 50% 50%, rgba(212,175,55,0.04), transparent),
+        var(--bg);
+    }
+    .stars {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        radial-gradient(1px 1px at 20% 30%, rgba(212,175,55,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 80% 10%, rgba(212,175,55,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 70%, rgba(212,175,55,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 10% 80%, rgba(212,175,55,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 50%, rgba(212,175,55,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 35% 90%, rgba(255,255,255,0.2) 0%, transparent 100%);
+      animation: twinkle 6s ease-in-out infinite alternate;
+    }
+    @keyframes twinkle { from{opacity:0.7} to{opacity:1} }
+
+    /* ── SCREENS ── */
+    .screen { position: relative; z-index: 1; display: none; width: 100%; }
+    .screen.active { display: flex; }
+
+    /* ════════════════════════════════
+       TITLE SCREEN
+    ════════════════════════════════ */
+    #title-screen {
+      flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 40px 20px; text-align: center;
+    }
+    .title-emblem {
+      font-size: 5rem; margin-bottom: 16px;
+      animation: float 4s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(212,175,55,0.5));
+    }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    .title-runes {
+      font-family: 'Cinzel', serif;
+      color: var(--gold-dim); font-size: 0.9rem; letter-spacing: 0.4em;
+      margin-bottom: 24px; opacity: 0.6;
+    }
+    h1.title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(2rem, 6vw, 3.8rem);
+      color: var(--gold);
+      text-shadow: 0 0 60px rgba(212,175,55,0.5), 0 0 120px rgba(212,175,55,0.2);
+      margin-bottom: 8px; line-height: 1.1;
+    }
+    .title-sub {
+      font-family: 'IM Fell English', serif;
+      font-style: italic; color: var(--gold-dim);
+      font-size: 1.1rem; margin-bottom: 48px;
+    }
+    .title-divider {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 48px; width: 100%; max-width: 500px;
+    }
+    .title-divider::before, .title-divider::after {
+      content: ''; flex: 1;
+      height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dark), var(--gold), var(--gold-dark), transparent);
+    }
+    .title-divider span { color: var(--gold); font-size: 1.2rem; }
+
+    .class-select { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin-bottom: 32px; }
+    .class-card {
+      width: 140px; padding: 20px 12px;
+      background: linear-gradient(135deg, var(--bg2), var(--bg3));
+      border: 1px solid var(--border);
+      border-radius: 12px; cursor: pointer;
+      transition: all 0.3s; text-align: center;
+    }
+    .class-card:hover, .class-card.selected {
+      border-color: var(--gold);
+      background: linear-gradient(135deg, var(--bg3), #1f1608);
+      box-shadow: 0 0 20px rgba(212,175,55,0.15), inset 0 0 20px rgba(212,175,55,0.05);
+      transform: translateY(-4px);
+    }
+    .class-card.selected { box-shadow: 0 0 30px rgba(212,175,55,0.3), inset 0 0 20px rgba(212,175,55,0.1); }
+    .class-icon { font-size: 2.5rem; margin-bottom: 8px; }
+    .class-name { font-family: 'Cinzel', serif; color: var(--gold); font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; }
+    .class-desc { font-size: 0.7rem; color: var(--text-dim); line-height: 1.4; }
+
+    .name-input-wrap { margin-bottom: 32px; }
+    .name-input-wrap label { display: block; font-family:'Cinzel',serif; color:var(--gold-dim); font-size:0.8rem; letter-spacing:0.15em; margin-bottom:8px; }
+    .name-input {
+      background: var(--bg2); border: 1px solid var(--border);
+      color: var(--gold); font-family: 'IM Fell English', serif;
+      font-size: 1.1rem; padding: 10px 18px; border-radius: 8px;
+      text-align: center; width: 260px; outline: none;
+      transition: border-color 0.3s;
+    }
+    .name-input:focus { border-color: var(--gold); }
+
+    .btn {
+      display: inline-block; padding: 14px 40px;
+      background: linear-gradient(135deg, #b8960c, #d4af37, #b8960c);
+      color: #0a0704; font-family: 'Cinzel', serif;
+      font-weight: 700; font-size: 0.9rem; letter-spacing: 0.15em;
+      border: none; border-radius: 8px; cursor: pointer;
+      transition: all 0.3s; text-transform: uppercase;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,175,55,0.4); }
+    .btn:active { transform: translateY(0); }
+    .btn-ghost {
+      background: transparent; color: var(--gold-dim);
+      border: 1px solid var(--border); font-size: 0.8rem; padding: 8px 20px;
+    }
+    .btn-ghost:hover { border-color:var(--gold); color:var(--gold); box-shadow: none; background: rgba(212,175,55,0.05); }
+    .btn-danger { background: linear-gradient(135deg, #6b1010, #8b1a1a, #6b1010); color: #f0d0d0; }
+    .btn-danger:hover { box-shadow: 0 8px 30px rgba(139,26,26,0.4); }
+    .btn-sm { padding: 8px 16px; font-size: 0.75rem; }
+
+    /* ════════════════════════════════
+       GAME SCREEN
+    ════════════════════════════════ */
+    #game-screen {
+      flex-direction: column; width: 100%; max-width: 900px;
+      min-height: 100vh; padding: 16px;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 16px; margin-bottom: 12px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .player-avatar { font-size: 1.6rem; }
+    .player-info { flex: 1; }
+    .player-name { font-family:'Cinzel',serif; color:var(--gold); font-size:0.95rem; font-weight:700; }
+    .player-class { color:var(--gold-dim); font-size:0.7rem; font-family:'Cinzel',serif; letter-spacing:0.1em; }
+
+    .stat-bars { display: flex; gap: 10px; align-items: center; }
+    .stat-bar-wrap { display:flex; flex-direction:column; gap:3px; min-width: 90px; }
+    .stat-bar-label { display:flex; justify-content:space-between; font-size:0.65rem; font-family:'Cinzel',serif; color:var(--text-dim); }
+    .stat-bar-label span:last-child { color: var(--text); }
+    .stat-bar-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+    .stat-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+    .hp-fill { background: linear-gradient(90deg, #8b1a1a, #c0392b); }
+    .mp-fill { background: linear-gradient(90deg, #1a3a5c, #2980b9); }
+    .xp-fill { background: linear-gradient(90deg, #2d5a1e, #27ae60); }
+
+    .top-gold { display:flex; align-items:center; gap:6px; font-family:'Cinzel',serif; color:var(--gold); font-size:0.85rem; }
+    .top-gold .g-icon { font-size:1rem; }
+    .level-badge {
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      color: #0a0704; font-family:'Cinzel',serif; font-weight:700;
+      font-size:0.7rem; padding:4px 10px; border-radius:20px;
+      white-space: nowrap;
+    }
+
+    /* Main area */
+    .game-main {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 12px;
+      flex: 1;
+    }
+
+    /* Scene Panel */
+    .scene-panel {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .scene-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; flex: 1;
+      position: relative; overflow: hidden; min-height: 260px;
+    }
+    .scene-box::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.4;
+    }
+    .scene-location {
+      font-family:'Cinzel',serif; color:var(--gold-dim);
+      font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase;
+      margin-bottom: 12px; display:flex; align-items:center; gap:8px;
+    }
+    .scene-location::after { content:''; flex:1; height:1px; background: var(--border); }
+    .scene-title {
+      font-family:'Cinzel',serif; color:var(--gold);
+      font-size:1.2rem; margin-bottom:12px;
+    }
+    #scene-text {
+      line-height: 1.8; color: var(--text); font-size:0.95rem;
+      font-style: italic;
+    }
+    .scene-img { font-size: 4rem; text-align:center; margin-bottom:12px; opacity:0.8; }
+
+    /* Log */
+    .log-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; max-height: 160px;
+      overflow-y: auto;
+    }
+    .log-box::-webkit-scrollbar { width:4px; }
+    .log-box::-webkit-scrollbar-track { background: transparent; }
+    .log-box::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius:2px; }
+    .log-entry {
+      font-size: 0.8rem; line-height: 1.5; padding: 2px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      color: var(--text-dim);
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+    .log-entry.combat { color: #e07070; }
+    .log-entry.loot { color: var(--gold); }
+    .log-entry.heal { color: #70e090; }
+    .log-entry.magic { color: #90b0e0; }
+    .log-entry.system { color: var(--text-dim); font-style:italic; }
+
+    /* Actions */
+    .actions-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px;
+    }
+    .actions-label { font-family:'Cinzel',serif; color:var(--gold-dim); font-size:0.65rem; letter-spacing:0.2em; margin-bottom:10px; }
+    .action-grid { display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
+    .action-btn {
+      padding: 10px 8px; background: var(--bg3);
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family:'Cinzel',serif; font-size:0.72rem;
+      cursor: pointer; transition: all 0.2s; text-align:center;
+      letter-spacing: 0.05em;
+    }
+    .action-btn:hover:not(:disabled) {
+      border-color: var(--gold); color: var(--gold);
+      background: rgba(212,175,55,0.08);
+      transform: translateY(-1px);
+    }
+    .action-btn:disabled { opacity:0.35; cursor:not-allowed; }
+    .action-btn .ab-icon { font-size:1.2rem; display:block; margin-bottom:3px; }
+
+    /* Side Panel */
+    .side-panel { display:flex; flex-direction:column; gap:12px; }
+
+    .panel-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px;
+    }
+    .panel-title {
+      font-family:'Cinzel',serif; color:var(--gold);
+      font-size:0.75rem; font-weight:700; letter-spacing:0.15em;
+      margin-bottom:12px; display:flex; align-items:center; gap:8px;
+    }
+    .panel-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* Stats */
+    .stat-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .stat-row:last-child { border:none; }
+    .stat-row .s-name { color:var(--text-dim); font-size:0.75rem; }
+    .stat-row .s-val { color:var(--gold); font-family:'Cinzel',serif; font-size:0.8rem; font-weight:600; }
+
+    /* Inventory */
+    .inv-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:8px; }
+    .inv-slot {
+      aspect-ratio:1; background:var(--bg3); border:1px solid var(--border);
+      border-radius:6px; display:flex; align-items:center; justify-content:center;
+      font-size:1.2rem; cursor:pointer; transition:all 0.2s; position:relative;
+    }
+    .inv-slot:hover { border-color:var(--gold); transform:scale(1.08); }
+    .inv-slot.empty { opacity:0.2; cursor:default; }
+    .inv-slot.empty:hover { border-color:var(--border); transform:none; }
+    .inv-slot .qty {
+      position:absolute; bottom:1px; right:3px;
+      font-size:0.55rem; color:var(--gold); font-family:'Cinzel',serif;
+    }
+    .item-tooltip {
+      position:fixed; z-index:100; background:#1a1208;
+      border:1px solid var(--gold); border-radius:8px;
+      padding:10px 14px; font-size:0.78rem; pointer-events:none;
+      max-width:200px; line-height:1.5;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.8);
+    }
+    .item-tooltip .it-name { font-family:'Cinzel',serif; color:var(--gold); margin-bottom:4px; }
+    .item-tooltip .it-type { color:var(--gold-dim); font-size:0.7rem; margin-bottom:6px; }
+    .item-tooltip .it-desc { color:var(--text-dim); }
+    .item-tooltip .it-stat { color:var(--green-bright); font-size:0.75rem; }
+
+    /* Map */
+    .map-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; }
+    .map-node {
+      padding:6px 4px; background:var(--bg3); border:1px solid var(--border);
+      border-radius:6px; text-align:center; cursor:pointer;
+      transition:all 0.2s; font-size:0.6rem; color:var(--text-dim);
+    }
+    .map-node:hover:not(.locked):not(.current) { border-color:var(--gold); color:var(--gold); }
+    .map-node.current { border-color:var(--gold); background:rgba(212,175,55,0.1); color:var(--gold); }
+    .map-node.locked { opacity:0.3; cursor:not-allowed; }
+    .map-node .mn-icon { font-size:1.1rem; display:block; margin-bottom:2px; }
+
+    /* ════════════════════════════════
+       COMBAT SCREEN
+    ════════════════════════════════ */
+    #combat-screen {
+      flex-direction: column; align-items:center; justify-content:center;
+      min-height: 100vh; padding: 20px; width:100%;
+    }
+    .combat-arena {
+      width: 100%; max-width: 700px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; position:relative; overflow:hidden;
+    }
+    .combat-arena::before {
+      content:''; position:absolute; inset:0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(139,26,26,0.08), transparent);
+      pointer-events:none;
+    }
+    .combat-header {
+      text-align:center; margin-bottom:24px;
+    }
+    .combat-header h2 { font-family:'Cinzel',serif; color:var(--gold); font-size:1.4rem; margin-bottom:4px; }
+    .combat-header p { color:var(--text-dim); font-size:0.85rem; font-style:italic; }
+
+    .combatants { display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:center; margin-bottom:24px; }
+    .combatant-card {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius:12px; padding:16px; text-align:center;
+    }
+    .combatant-card.player-card { border-color:rgba(212,175,55,0.3); }
+    .combatant-card.enemy-card { border-color:rgba(139,26,26,0.4); }
+    .combatant-avatar { font-size:3rem; margin-bottom:8px; }
+    .combatant-name { font-family:'Cinzel',serif; color:var(--gold); font-size:0.9rem; margin-bottom:8px; }
+    .combat-hp-bar { height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden; margin-bottom:4px; }
+    .combat-hp-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#8b1a1a,#c0392b); transition:width 0.4s ease; }
+    .combat-hp-text { font-size:0.7rem; color:var(--text-dim); font-family:'Cinzel',serif; }
+    .combat-vs { font-family:'Cinzel',serif; color:var(--gold-dim); font-size:1.2rem; opacity:0.6; }
+
+    .combat-log {
+      background: var(--bg); border:1px solid var(--border);
+      border-radius:8px; padding:12px; height:120px; overflow-y:auto;
+      margin-bottom:20px; font-size:0.82rem;
+    }
+    .combat-log::-webkit-scrollbar { width:3px; }
+    .combat-log::-webkit-scrollbar-thumb { background:var(--gold-dark); }
+
+    .combat-actions { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+    .combat-btn {
+      padding:10px 24px; background:var(--bg3);
+      border:1px solid var(--border); border-radius:8px;
+      color:var(--text); font-family:'Cinzel',serif; font-size:0.78rem;
+      cursor:pointer; transition:all 0.2s; letter-spacing:0.08em;
+    }
+    .combat-btn:hover:not(:disabled) { border-color:var(--gold); color:var(--gold); background:rgba(212,175,55,0.08); }
+    .combat-btn.primary { background:linear-gradient(135deg,#6b1010,#8b1a1a); border-color:#8b1a1a; color:#f0d0d0; }
+    .combat-btn.primary:hover { box-shadow:0 4px 20px rgba(139,26,26,0.4); }
+    .combat-btn:disabled { opacity:0.35; cursor:not-allowed; }
+
+    .combat-anim {
+      position:absolute; inset:0; pointer-events:none;
+      display:flex; align-items:center; justify-content:center;
+      font-size:4rem; opacity:0; transition:opacity 0.1s;
+    }
+    .combat-anim.show { opacity:1; animation:strike 0.5s ease forwards; }
+    @keyframes strike { 0%{transform:scale(0.5);opacity:1} 70%{transform:scale(1.3);opacity:1} 100%{transform:scale(2);opacity:0} }
+
+    /* ════════════════════════════════
+       SHOP SCREEN
+    ════════════════════════════════ */
+    #shop-screen {
+      flex-direction:column; align-items:center; justify-content:center;
+      min-height:100vh; padding:20px; width:100%;
+    }
+    .shop-box {
+      width:100%; max-width:720px;
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:16px; padding:24px;
+    }
+    .shop-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .shop-header h2 { font-family:'Cinzel',serif; color:var(--gold); font-size:1.3rem; }
+    .shop-gold { display:flex; align-items:center; gap:8px; font-family:'Cinzel',serif; color:var(--gold); }
+    .shop-items { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-bottom:20px; }
+    .shop-item {
+      background:var(--bg3); border:1px solid var(--border);
+      border-radius:10px; padding:14px; text-align:center; cursor:pointer;
+      transition:all 0.25s;
+    }
+    .shop-item:hover { border-color:var(--gold); transform:translateY(-2px); box-shadow:0 6px 20px rgba(212,175,55,0.1); }
+    .shop-item.cant-afford { opacity:0.4; cursor:not-allowed; }
+    .shop-item .si-icon { font-size:2rem; margin-bottom:6px; }
+    .shop-item .si-name { font-family:'Cinzel',serif; color:var(--gold); font-size:0.78rem; margin-bottom:4px; }
+    .shop-item .si-desc { color:var(--text-dim); font-size:0.7rem; margin-bottom:8px; line-height:1.4; }
+    .shop-item .si-price { color:var(--gold); font-family:'Cinzel',serif; font-size:0.82rem; }
+
+    /* Overlay Notifications */
+    .notification {
+      position:fixed; top:20px; left:50%; transform:translateX(-50%);
+      background:var(--bg3); border:1px solid var(--gold);
+      color:var(--gold); font-family:'Cinzel',serif; font-size:0.85rem;
+      padding:10px 24px; border-radius:8px; z-index:1000;
+      box-shadow:0 8px 30px rgba(0,0,0,0.6);
+      animation: notifyIn 0.3s ease, notifyOut 0.3s ease 2.7s forwards;
+      pointer-events:none;
+    }
+    @keyframes notifyIn { from{opacity:0;transform:translateX(-50%) translateY(-20px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+    @keyframes notifyOut { from{opacity:1} to{opacity:0} }
+
+    /* Responsive */
+    @media(max-width:700px) {
+      .game-main { grid-template-columns:1fr; }
+      .side-panel { display:none; }
+      .combatants { grid-template-columns:1fr auto 1fr; }
+    }
+
+    /* Scrollbar global */
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:var(--gold-dark); border-radius:3px; }
   </style>
 </head>
 <body>
-  <div class="bg"></div>
-  <div class="content">
-    <div class="rune">ᚱᚦᛟ</div>
-    <h1>Aethermoor Chronicles</h1>
-    <p class="subtitle">Fantasy RPG · Eclipse Interactive</p>
-    <div class="placeholder">
-      ⚔ This is a game placeholder.<br>
-      Place your actual game files in <code>spiele/game1/</code><br>
-      and rename this file or replace it with your game's <code>index.html</code>.
+
+<div class="bg-layer"></div>
+<div class="stars"></div>
+<div id="tooltip" class="item-tooltip" style="display:none"></div>
+
+<!-- ════ TITLE SCREEN ════ -->
+<div id="title-screen" class="screen active">
+  <div class="title-emblem">⚔</div>
+  <div class="title-runes">ᚱᚦᛟ · ᚨᛖᚦᛖᚱ · ᛗᛟᛟᚱ · ᚱᚦᛟ</div>
+  <h1 class="title">Aethermoor<br>Chronicles</h1>
+  <p class="title-sub">A World of Ancient Darkness & Forgotten Magic</p>
+  <div class="title-divider"><span>✦</span></div>
+
+  <div class="class-select" id="class-select">
+    <div class="class-card" data-class="warrior">
+      <div class="class-icon">🗡️</div>
+      <div class="class-name">Warrior</div>
+      <div class="class-desc">High HP & strength. Cleave through your foes.</div>
     </div>
-    <a href="../../index.html">← Back to Eclipse Interactive</a>
+    <div class="class-card" data-class="mage">
+      <div class="class-icon">🔮</div>
+      <div class="class-name">Mage</div>
+      <div class="class-desc">Devastating spells. Fragile but powerful.</div>
+    </div>
+    <div class="class-card" data-class="ranger">
+      <div class="class-icon">🏹</div>
+      <div class="class-name">Ranger</div>
+      <div class="class-desc">Swift & precise. Excels at evasion.</div>
+    </div>
+    <div class="class-card" data-class="cleric">
+      <div class="class-icon">✨</div>
+      <div class="class-name">Cleric</div>
+      <div class="class-desc">Holy magic and healing. A true survivor.</div>
+    </div>
   </div>
+
+  <div class="name-input-wrap">
+    <label>Name thy Hero</label>
+    <input class="name-input" id="hero-name" type="text" placeholder="Enter your name…" maxlength="20" value="Aerin">
+  </div>
+  <button class="btn" onclick="startGame()">Begin the Journey</button>
+</div>
+
+<!-- ════ GAME SCREEN ════ -->
+<div id="game-screen" class="screen">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="player-avatar" id="avatar">🗡️</div>
+    <div class="player-info">
+      <div class="player-name" id="hud-name">Aerin</div>
+      <div class="player-class" id="hud-class">WARRIOR · LEVEL 1</div>
+    </div>
+    <div class="stat-bars">
+      <div class="stat-bar-wrap">
+        <div class="stat-bar-label"><span>❤ HP</span><span id="hp-text">100/100</span></div>
+        <div class="stat-bar-track"><div class="stat-bar-fill hp-fill" id="hp-bar" style="width:100%"></div></div>
+      </div>
+      <div class="stat-bar-wrap">
+        <div class="stat-bar-label"><span>✦ MP</span><span id="mp-text">50/50</span></div>
+        <div class="stat-bar-track"><div class="stat-bar-fill mp-fill" id="mp-bar" style="width:100%"></div></div>
+      </div>
+      <div class="stat-bar-wrap">
+        <div class="stat-bar-label"><span>⭐ XP</span><span id="xp-text">0/100</span></div>
+        <div class="stat-bar-track"><div class="stat-bar-fill xp-fill" id="xp-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="top-gold"><span class="g-icon">🪙</span><span id="hud-gold">0</span></div>
+    <div class="level-badge" id="level-badge">LVL 1</div>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="game-main">
+    <div class="scene-panel">
+      <!-- Scene -->
+      <div class="scene-box">
+        <div class="scene-location" id="scene-location">Aethermoor · Northgate Village</div>
+        <div class="scene-img" id="scene-img">🏚️</div>
+        <div class="scene-title" id="scene-title">The Ruined Village</div>
+        <div id="scene-text">The smell of ash hangs heavy in the cold air. What was once Northgate Village now lies in smoldering ruin. Skeletal trees line a broken path leading deeper into the moor. You grip your weapon and step forward — the only way is onward.</div>
+      </div>
+
+      <!-- Log -->
+      <div class="log-box" id="game-log">
+        <div class="log-entry system">— Your journey begins… —</div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions-box">
+        <div class="actions-label">What will you do?</div>
+        <div class="action-grid" id="actions-grid">
+          <button class="action-btn" onclick="doExplore()"><span class="ab-icon">🔍</span>Explore Area</button>
+          <button class="action-btn" onclick="doRest()"><span class="ab-icon">🔥</span>Rest at Fire</button>
+          <button class="action-btn" onclick="goShop()"><span class="ab-icon">🏪</span>Visit Merchant</button>
+          <button class="action-btn" onclick="doSkill()"><span class="ab-icon">✨</span>Use Ability</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side Panel -->
+    <div class="side-panel">
+      <!-- Stats -->
+      <div class="panel-box">
+        <div class="panel-title">Attributes</div>
+        <div class="stat-row"><span class="s-name">⚔ Strength</span><span class="s-val" id="st-str">10</span></div>
+        <div class="stat-row"><span class="s-name">🔮 Magic</span><span class="s-val" id="st-mag">5</span></div>
+        <div class="stat-row"><span class="s-name">🏹 Agility</span><span class="s-val" id="st-agi">8</span></div>
+        <div class="stat-row"><span class="s-name">🛡 Defense</span><span class="s-val" id="st-def">6</span></div>
+        <div class="stat-row"><span class="s-name">🎲 Luck</span><span class="s-val" id="st-lck">5</span></div>
+      </div>
+
+      <!-- Inventory -->
+      <div class="panel-box">
+        <div class="panel-title">Inventory</div>
+        <div class="inv-grid" id="inv-grid"></div>
+        <div style="font-size:0.7rem;color:var(--text-dim);text-align:center">Hover to inspect · Click to use</div>
+      </div>
+
+      <!-- World Map -->
+      <div class="panel-box">
+        <div class="panel-title">World Map</div>
+        <div class="map-grid" id="map-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ COMBAT SCREEN ════ -->
+<div id="combat-screen" class="screen">
+  <div class="combat-arena">
+    <div class="combat-anim" id="combat-anim">⚡</div>
+    <div class="combat-header">
+      <h2 id="combat-title">Combat!</h2>
+      <p id="combat-subtitle">A wild enemy appears!</p>
+    </div>
+    <div class="combatants">
+      <div class="combatant-card player-card">
+        <div class="combatant-avatar" id="cb-player-icon">🗡️</div>
+        <div class="combatant-name" id="cb-player-name">Hero</div>
+        <div class="combat-hp-bar"><div class="combat-hp-fill" id="cb-player-hp" style="width:100%"></div></div>
+        <div class="combat-hp-text" id="cb-player-hp-text">100/100</div>
+      </div>
+      <div class="combat-vs">⚔</div>
+      <div class="combatant-card enemy-card">
+        <div class="combatant-avatar" id="cb-enemy-icon">👹</div>
+        <div class="combatant-name" id="cb-enemy-name">Enemy</div>
+        <div class="combat-hp-bar"><div class="combat-hp-fill" id="cb-enemy-hp" style="width:100%"></div></div>
+        <div class="combat-hp-text" id="cb-enemy-hp-text">50/50</div>
+      </div>
+    </div>
+    <div class="combat-log" id="combat-log"></div>
+    <div class="combat-actions">
+      <button class="combat-btn primary" id="cb-attack" onclick="combatAction('attack')">⚔ Attack</button>
+      <button class="combat-btn" id="cb-skill" onclick="combatAction('skill')">✨ Special</button>
+      <button class="combat-btn" id="cb-item" onclick="combatAction('item')">🧪 Use Potion</button>
+      <button class="combat-btn" id="cb-flee" onclick="combatAction('flee')">💨 Flee</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ SHOP SCREEN ════ -->
+<div id="shop-screen" class="screen">
+  <div class="shop-box">
+    <div class="shop-header">
+      <div>
+        <h2>🏪 Wandering Merchant</h2>
+        <p style="color:var(--text-dim);font-size:0.8rem;font-style:italic">"For the right price, traveller…"</p>
+      </div>
+      <div class="shop-gold">🪙 <span id="shop-gold-display">0</span></div>
+    </div>
+    <div class="shop-items" id="shop-items"></div>
+    <div style="text-align:center">
+      <button class="btn btn-ghost" onclick="leaveShop()">← Return to Adventure</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+//  GAME DATA
+// ══════════════════════════════════════
+const CLASSES = {
+  warrior: { name:'Warrior', icon:'🗡️', hp:140, mp:30, str:14,mag:4,agi:8,def:12,lck:5, skill:'Berserker Rage', skillIcon:'💢', skillDesc:'Deal 200% weapon damage to all enemies.', skillMp:10 },
+  mage:    { name:'Mage',    icon:'🔮', hp:70,  mp:100,str:5,mag:18,agi:9,def:4, lck:7, skill:'Arcane Bolt', skillIcon:'⚡', skillDesc:'Channel pure arcane energy for massive damage.', skillMp:20 },
+  ranger:  { name:'Ranger',  icon:'🏹', hp:95,  mp:50, str:9,mag:7,agi:16,def:7,lck:12, skill:'Eagle Eye', skillIcon:'🎯', skillDesc:'Guaranteed critical hit with high precision.', skillMp:15 },
+  cleric:  { name:'Cleric',  icon:'✨', hp:100, mp:80, str:7,mag:12,agi:7,def:9,lck:8, skill:'Holy Light', skillIcon:'☀️', skillDesc:'Heal self for 40 HP and smite the undead.', skillMp:18 },
+};
+
+const ITEMS = {
+  potion:    { id:'potion',    name:'Health Potion',  icon:'🧪', type:'Consumable', desc:'Restores 40 HP.', stat:'+40 HP', use: p=>{ const h=Math.min(p.hpMax,p.hp+40); addLog(`You drink a Health Potion. +${h-p.hp} HP`,'heal'); p.hp=h; } },
+  mpotion:   { id:'mpotion',   name:'Mana Potion',    icon:'💙', type:'Consumable', desc:'Restores 30 MP.', stat:'+30 MP', use: p=>{ const m=Math.min(p.mpMax,p.mp+30); addLog(`You drink a Mana Potion. +${m-p.mp} MP`,'magic'); p.mp=m; } },
+  bread:     { id:'bread',     name:'Elven Bread',    icon:'🍞', type:'Consumable', desc:'Restores 20 HP.', stat:'+20 HP', use: p=>{ const h=Math.min(p.hpMax,p.hp+20); addLog(`You eat Elven Bread. +${h-p.hp} HP`,'heal'); p.hp=h; } },
+  sword:     { id:'sword',     name:'Iron Sword',     icon:'⚔️', type:'Weapon',     desc:'A sturdy iron blade.', stat:'+4 STR', equip:true, bonus:{str:4} },
+  shield:    { id:'shield',    name:'Kite Shield',    icon:'🛡️', type:'Armor',      desc:'Sturdy kite shield.', stat:'+4 DEF', equip:true, bonus:{def:4} },
+  tome:      { id:'tome',      name:'Arcane Tome',    icon:'📖', type:'Weapon',     desc:'A tome humming with power.', stat:'+5 MAG', equip:true, bonus:{mag:5} },
+  bow:       { id:'bow',       name:'Elven Bow',      icon:'🏹', type:'Weapon',     desc:'Carved from silverwood.', stat:'+4 AGI', equip:true, bonus:{agi:4} },
+  amulet:    { id:'amulet',    name:'Lucky Amulet',   icon:'📿', type:'Accessory',  desc:'Ancient charm.', stat:'+4 LCK', equip:true, bonus:{lck:4} },
+  emerald:   { id:'emerald',   name:'Emerald Gem',    icon:'💚', type:'Quest Item', desc:'A rare gem, worth selling.', stat:'Vendor trash', equip:false },
+  darkcryst: { id:'darkcryst', name:'Dark Crystal',   icon:'🔮', type:'Quest Item', desc:'Pulsates with dark energy.', stat:'Mysterious…', equip:false },
+};
+
+const SHOP_CATALOG = [
+  { item:'potion',  price:15 },
+  { item:'mpotion', price:20 },
+  { item:'bread',   price:8  },
+  { item:'sword',   price:60 },
+  { item:'shield',  price:55 },
+  { item:'tome',    price:70 },
+  { item:'bow',     price:65 },
+  { item:'amulet',  price:80 },
+];
+
+const LOCATIONS = [
+  { id:'village', name:'Northgate Village', icon:'🏚️', region:'Aethermoor', scene:'The smell of ash hangs heavy. What was once Northgate lies in smoldering ruin. Skeletal trees line a broken path deeper into the moor.', locked:false },
+  { id:'forest',  name:'Darkwood Forest', icon:'🌲', region:'Aethermoor', scene:'Ancient trees loom overhead, their bark black as pitch. Strange lights flicker between the gnarled roots. Something watches from the shadows.', locked:false },
+  { id:'ruins',   name:'Sunken Ruins', icon:'🏛️', region:'Aethermoor', scene:'Half-submerged stones jut from murky water. Faded runes glow faintly on collapsed archways. A cold mist clings to everything.', locked:false },
+  { id:'cave',    name:'Crystal Caves', icon:'💎', region:'Aethermoor', scene:'Bioluminescent crystals illuminate cavern walls in shades of blue and violet. The air is clean but unnervingly silent.', locked:false },
+  { id:'castle',  name:'Shadowkeep', icon:'🏰', region:'Aethermoor · North', scene:'The fortress towers against a blood-red sky. Its gates are sealed with dark magic, yet a hidden passage may remain…', locked:true },
+  { id:'tower',   name:'Mage Tower', icon:'🗼', region:'Aethermoor · East', scene:'A spire of obsidian glass pierces the clouds. Arcane storms crackle around its peak. Forbidden knowledge awaits within.', locked:true },
+  { id:'swamp',   name:'Plague Marsh', icon:'🌿', region:'Aethermoor · South', scene:'The water is black. The air tastes of rot. Strange creatures stir beneath the surface. Only the desperate venture here.', locked:true },
+  { id:'peak',    name:'Dragon\'s Reach', icon:'🗻', region:'Aethermoor · Summit', scene:'The mountain peak pierces the clouds. Ancient dragon bones litter the plateau. Something still sleeps here.', locked:true },
+];
+
+const ENEMIES_BY_ZONE = {
+  village: [
+    { name:'Grave Revenant', icon:'💀', hp:35, atk:8, def:3, xp:20, gold:12, desc:'A shambling corpse, still clutching rusted iron.' },
+    { name:'Shadow Wraith',  icon:'👻', hp:28, atk:11,def:2, xp:25, gold:15, desc:'Translucent and wailing, it drains warmth from air.' },
+    { name:'Feral Hound',    icon:'🐺', hp:40, atk:9, def:4, xp:18, gold:10, desc:'A massive black wolf, eyes glowing with cursed fire.' },
+  ],
+  forest: [
+    { name:'Twisted Dryad',  icon:'🌿', hp:50, atk:12,def:5, xp:35, gold:20, desc:'Once beautiful, now corrupted by dark magic.' },
+    { name:'Forest Spider',  icon:'🕷️', hp:38, atk:14,def:3, xp:30, gold:18, desc:'A spider the size of a horse, dripping venom.' },
+    { name:'Barrow Knight',  icon:'⚔️', hp:65, atk:15,def:8, xp:50, gold:30, desc:'An ancient warrior trapped in cursed armor.' },
+  ],
+  ruins: [
+    { name:'Stone Golem',    icon:'🗿', hp:80, atk:16,def:12,xp:60, gold:35, desc:'Animated by rune-magic, slow but indestructible.' },
+    { name:'Cursed Scholar', icon:'📜', hp:45, atk:18,def:4, xp:55, gold:40, desc:'A mad mage who forgot how to die.' },
+    { name:'Ruin Serpent',   icon:'🐍', hp:58, atk:15,def:6, xp:48, gold:28, desc:'An enormous serpent nesting in the flooded halls.' },
+  ],
+  cave: [
+    { name:'Crystal Golem',  icon:'💎', hp:90, atk:18,def:14,xp:75, gold:45, desc:'Its crystalline body refracts light into deadly beams.' },
+    { name:'Cave Troll',     icon:'👾', hp:100,atk:20,def:10,xp:80, gold:50, desc:'Enormous and brutal. Regenerates if not killed fast.' },
+    { name:'Void Bat',       icon:'🦇', hp:42, atk:16,def:5, xp:45, gold:25, desc:'Emits sonic blasts that shatter concentration.' },
+  ],
+};
+
+const EXPLORE_EVENTS = [
+  { w:30, type:'combat' },
+  { w:20, type:'loot',  text:'You find a weathered chest half-buried in rubble.', rewards:['gold','potion'] },
+  { w:15, type:'loot',  text:'A fallen traveller\'s satchel lies on the path.', rewards:['gold','bread'] },
+  { w:10, type:'story', text:'You discover a stone tablet covered in ancient script. Your mind fills with forgotten lore.' },
+  { w:8,  type:'trap',  text:'A runic trap snaps shut! You take minor damage escaping it.' },
+  { w:7,  type:'rest',  text:'You find a sheltered nook and catch your breath. HP restored slightly.' },
+  { w:5,  type:'npc',   text:'A cloaked figure approaches. "Traveller… beware the Shadowkeep. It hungers." They vanish.' },
+  { w:5,  type:'rare',  text:'A glimmer catches your eye — a rare gem half-buried in the earth!' },
+];
+
+// ══════════════════════════════════════
+//  GAME STATE
+// ══════════════════════════════════════
+let G = {}; // game state
+let combat = {}; // combat state
+let selectedClass = 'warrior';
+
+function initPlayer(name, cls) {
+  const c = CLASSES[cls];
+  return {
+    name, cls, icon: c.icon,
+    hp: c.hp, hpMax: c.hp,
+    mp: c.mp, mpMax: c.mp,
+    xp: 0, xpNext: 100, level: 1,
+    gold: 30,
+    str: c.str, mag: c.mag, agi: c.agi, def: c.def, lck: c.lck,
+    inventory: ['potion','potion','bread'],
+    location: 'village',
+    kills: 0, steps: 0,
+  };
+}
+
+// ══════════════════════════════════════
+//  TITLE SCREEN
+// ══════════════════════════════════════
+document.querySelectorAll('.class-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.class-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedClass = card.dataset.class;
+  });
+});
+document.querySelector('.class-card').classList.add('selected');
+
+function startGame() {
+  const name = document.getElementById('hero-name').value.trim() || 'Aerin';
+  G.player = initPlayer(name, selectedClass);
+  showScreen('game-screen');
+  updateHUD();
+  renderInventory();
+  renderMap();
+  loadScene(G.player.location);
+  addLog(`${name} the ${CLASSES[selectedClass].name} begins their journey into Aethermoor.`, 'system');
+}
+
+// ══════════════════════════════════════
+//  SCREEN MANAGEMENT
+// ══════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ══════════════════════════════════════
+//  HUD UPDATE
+// ══════════════════════════════════════
+function updateHUD() {
+  const p = G.player;
+  document.getElementById('avatar').textContent = p.icon;
+  document.getElementById('hud-name').textContent = p.name;
+  document.getElementById('hud-class').textContent = `${CLASSES[p.cls].name.toUpperCase()} · LEVEL ${p.level}`;
+  document.getElementById('hud-gold').textContent = p.gold;
+  document.getElementById('level-badge').textContent = `LVL ${p.level}`;
+
+  document.getElementById('hp-text').textContent = `${p.hp}/${p.hpMax}`;
+  document.getElementById('mp-text').textContent = `${p.mp}/${p.mpMax}`;
+  document.getElementById('xp-text').textContent = `${p.xp}/${p.xpNext}`;
+  document.getElementById('hp-bar').style.width = `${(p.hp/p.hpMax)*100}%`;
+  document.getElementById('mp-bar').style.width = `${(p.mp/p.mpMax)*100}%`;
+  document.getElementById('xp-bar').style.width = `${(p.xp/p.xpNext)*100}%`;
+
+  document.getElementById('st-str').textContent = p.str;
+  document.getElementById('st-mag').textContent = p.mag;
+  document.getElementById('st-agi').textContent = p.agi;
+  document.getElementById('st-def').textContent = p.def;
+  document.getElementById('st-lck').textContent = p.lck;
+}
+
+// ══════════════════════════════════════
+//  SCENE
+// ══════════════════════════════════════
+function loadScene(locId) {
+  const loc = LOCATIONS.find(l => l.id === locId);
+  if (!loc) return;
+  document.getElementById('scene-location').innerHTML = `${loc.region} · <span style="color:var(--gold)">${loc.name}</span>`;
+  document.getElementById('scene-img').textContent = loc.icon;
+  document.getElementById('scene-title').textContent = loc.name;
+  document.getElementById('scene-text').textContent = loc.scene;
+}
+
+// ══════════════════════════════════════
+//  LOG
+// ══════════════════════════════════════
+function addLog(text, type='') {
+  const log = document.getElementById('game-log');
+  const el = document.createElement('div');
+  el.className = `log-entry${type?' '+type:''}`;
+  el.textContent = text;
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+}
+
+function addCombatLog(text) {
+  const log = document.getElementById('combat-log');
+  const el = document.createElement('div');
+  el.className = 'log-entry';
+  el.textContent = text;
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+}
+
+// ══════════════════════════════════════
+//  ACTIONS
+// ══════════════════════════════════════
+function doExplore() {
+  const p = G.player;
+  p.steps++;
+
+  // Weighted random event
+  const total = EXPLORE_EVENTS.reduce((s, e) => s + e.w, 0);
+  let roll = Math.random() * total;
+  let event = EXPLORE_EVENTS[0];
+  for (const e of EXPLORE_EVENTS) { roll -= e.w; if (roll <= 0) { event = e; break; } }
+
+  if (event.type === 'combat') {
+    const zone = ENEMIES_BY_ZONE[p.location] || ENEMIES_BY_ZONE.village;
+    const enemyTemplate = zone[Math.floor(Math.random() * zone.length)];
+    startCombat({...enemyTemplate, hpMax: enemyTemplate.hp});
+    return;
+  }
+  if (event.type === 'loot') {
+    const goldAmt = Math.floor(Math.random() * 20) + 8;
+    p.gold += goldAmt;
+    addLog(`${event.text}`, 'loot');
+    addLog(`You find ${goldAmt} gold!`, 'loot');
+    if (event.rewards.includes('potion') && Math.random() > 0.5) {
+      p.inventory.push('potion');
+      addLog('You find a Health Potion!', 'loot');
+      renderInventory();
+    }
+    if (event.rewards.includes('bread') && Math.random() > 0.5) {
+      p.inventory.push('bread');
+      addLog('You find Elven Bread!', 'loot');
+      renderInventory();
+    }
+    updateHUD();
+  }
+  if (event.type === 'rare') {
+    p.inventory.push(Math.random() > 0.5 ? 'emerald' : 'darkcryst');
+    addLog('You discover a glimmering gem!', 'loot');
+    renderInventory();
+  }
+  if (event.type === 'trap') {
+    const dmg = Math.floor(Math.random()*10)+5;
+    p.hp = Math.max(1, p.hp - dmg);
+    addLog(`A runic trap! You take ${dmg} damage.`, 'combat');
+    updateHUD();
+  }
+  if (event.type === 'rest') {
+    const heal = Math.floor(Math.random()*15)+8;
+    p.hp = Math.min(p.hpMax, p.hp + heal);
+    addLog(`You find shelter and rest. +${heal} HP.`, 'heal');
+    updateHUD();
+  }
+  if (event.type === 'story') { addLog(event.text, 'system'); giveXP(15); }
+  if (event.type === 'npc') { addLog(event.text, 'system'); }
+}
+
+function doRest() {
+  const p = G.player;
+  const heal = Math.floor(p.hpMax * 0.35);
+  const mana = Math.floor(p.mpMax * 0.5);
+  p.hp = Math.min(p.hpMax, p.hp + heal);
+  p.mp = Math.min(p.mpMax, p.mp + mana);
+  addLog(`You rest by the fire. +${heal} HP, +${mana} MP.`, 'heal');
+  updateHUD();
+
+  // Random event while resting
+  if (Math.random() < 0.25) {
+    const zone = ENEMIES_BY_ZONE[p.location] || ENEMIES_BY_ZONE.village;
+    const enemy = zone[Math.floor(Math.random() * zone.length)];
+    setTimeout(() => {
+      addLog('Your rest is interrupted by a lurking enemy!', 'combat');
+      startCombat({...enemy, hpMax: enemy.hp});
+    }, 800);
+  }
+}
+
+function doSkill() {
+  const p = G.player;
+  const cls = CLASSES[p.cls];
+  if (p.mp < cls.skillMp) { notify(`Not enough MP! Need ${cls.skillMp}.`); return; }
+  p.mp -= cls.skillMp;
+
+  if (p.cls === 'cleric') {
+    const heal = 40;
+    p.hp = Math.min(p.hpMax, p.hp + heal);
+    addLog(`☀️ Holy Light! You heal ${heal} HP.`, 'heal');
+  } else {
+    addLog(`${cls.skillIcon} ${cls.skill} — ability charged for the next battle!`, 'magic');
+    G.buffedSkill = true;
+  }
+  updateHUD();
+}
+
+// ══════════════════════════════════════
+//  TRAVEL
+// ══════════════════════════════════════
+function travelTo(locId) {
+  const loc = LOCATIONS.find(l => l.id === locId);
+  if (!loc || loc.locked) return;
+  G.player.location = locId;
+  loadScene(locId);
+  addLog(`You travel to ${loc.name}.`, 'system');
+  renderMap();
+
+  // Combat chance on travel
+  if (Math.random() < 0.4) {
+    const zone = ENEMIES_BY_ZONE[locId] || ENEMIES_BY_ZONE.village;
+    const enemy = zone[Math.floor(Math.random() * zone.length)];
+    setTimeout(() => {
+      addLog('An enemy blocks your path!', 'combat');
+      startCombat({...enemy, hpMax: enemy.hp});
+    }, 600);
+  }
+}
+
+// ══════════════════════════════════════
+//  MAP RENDER
+// ══════════════════════════════════════
+function renderMap() {
+  const grid = document.getElementById('map-grid');
+  grid.innerHTML = '';
+  LOCATIONS.forEach(loc => {
+    const el = document.createElement('div');
+    el.className = `map-node${loc.id===G.player.location?' current':''}${loc.locked?' locked':''}`;
+    el.innerHTML = `<span class="mn-icon">${loc.icon}</span>${loc.name.split(' ').slice(0,2).join(' ')}`;
+    if (!loc.locked && loc.id !== G.player.location) el.onclick = () => travelTo(loc.id);
+    grid.appendChild(el);
+  });
+}
+
+// ══════════════════════════════════════
+//  INVENTORY
+// ══════════════════════════════════════
+function renderInventory() {
+  const grid = document.getElementById('inv-grid');
+  grid.innerHTML = '';
+  const slots = 15;
+  
+  // Count items
+  const counts = {};
+  G.player.inventory.forEach(id => { counts[id] = (counts[id]||0)+1; });
+  const unique = [...new Set(G.player.inventory)];
+  
+  for (let i = 0; i < slots; i++) {
+    const slot = document.createElement('div');
+    if (i < unique.length) {
+      const id = unique[i];
+      const item = ITEMS[id];
+      slot.className = 'inv-slot';
+      slot.textContent = item.icon;
+      if (counts[id] > 1) slot.innerHTML += `<span class="qty">${counts[id]}</span>`;
+      slot.addEventListener('mouseenter', e => showTooltip(item, e));
+      slot.addEventListener('mouseleave', hideTooltip);
+      slot.addEventListener('mousemove', e => moveTooltip(e));
+      slot.addEventListener('click', () => useItem(id));
+    } else {
+      slot.className = 'inv-slot empty';
+      slot.textContent = '·';
+    }
+    grid.appendChild(slot);
+  }
+}
+
+function showTooltip(item, e) {
+  const tt = document.getElementById('tooltip');
+  tt.innerHTML = `<div class="it-name">${item.icon} ${item.name}</div>
+    <div class="it-type">${item.type}</div>
+    <div class="it-desc">${item.desc}</div>
+    <div class="it-stat">${item.stat}</div>`;
+  tt.style.display = 'block';
+  moveTooltip(e);
+}
+function hideTooltip() { document.getElementById('tooltip').style.display='none'; }
+function moveTooltip(e) {
+  const tt = document.getElementById('tooltip');
+  tt.style.left = (e.clientX + 12) + 'px';
+  tt.style.top = (e.clientY - 10) + 'px';
+}
+
+function useItem(id) {
+  const p = G.player;
+  const item = ITEMS[id];
+  if (!item) return;
+  if (item.use) {
+    item.use(p);
+    const idx = p.inventory.indexOf(id);
+    if (idx !== -1) p.inventory.splice(idx, 1);
+    renderInventory();
+    updateHUD();
+  } else {
+    notify(`${item.name} cannot be used this way.`);
+  }
+}
+
+// ══════════════════════════════════════
+//  COMBAT
+// ══════════════════════════════════════
+function startCombat(enemy) {
+  combat.enemy = {...enemy};
+  combat.player = G.player;
+  combat.turn = 0;
+  combat.over = false;
+  combat.skillReady = G.player.mp >= CLASSES[G.player.cls].skillMp;
+
+  document.getElementById('cb-player-icon').textContent = G.player.icon;
+  document.getElementById('cb-player-name').textContent = G.player.name;
+  document.getElementById('cb-enemy-icon').textContent = enemy.icon;
+  document.getElementById('cb-enemy-name').textContent = enemy.name;
+  document.getElementById('combat-title').textContent = `⚔ ${enemy.name}`;
+  document.getElementById('combat-subtitle').textContent = enemy.desc;
+  document.getElementById('combat-log').innerHTML = '';
+  document.getElementById('cb-skill').disabled = !combat.skillReady;
+  document.getElementById('cb-item').disabled = !G.player.inventory.includes('potion') && !G.player.inventory.includes('bread');
+
+  updateCombatHUD();
+  addCombatLog(`A ${enemy.name} appears! "${getEnemyTaunt()}"`);
+  showScreen('combat-screen');
+}
+
+function updateCombatHUD() {
+  const p = G.player;
+  const e = combat.enemy;
+  document.getElementById('cb-player-hp').style.width = `${(p.hp/p.hpMax)*100}%`;
+  document.getElementById('cb-player-hp-text').textContent = `${p.hp}/${p.hpMax}`;
+  document.getElementById('cb-enemy-hp').style.width = `${Math.max(0,(e.hp/e.hpMax)*100)}%`;
+  document.getElementById('cb-enemy-hp-text').textContent = `${Math.max(0,e.hp)}/${e.hpMax}`;
+}
+
+function getEnemyTaunt() {
+  const taunts = ['Die, mortal!','You dare face me?','Your bones will serve me.','None have survived.','Pathetic adventurer…'];
+  return taunts[Math.floor(Math.random()*taunts.length)];
+}
+
+function combatAction(action) {
+  if (combat.over) return;
+  const p = G.player;
+  const e = combat.enemy;
+  let playerDmg = 0;
+  let msg = '';
+
+  if (action === 'attack') {
+    const crit = Math.random() < 0.05 + p.lck * 0.01;
+    playerDmg = Math.max(1, Math.floor((p.str * 1.2) - e.def/2 + Math.random()*6));
+    if (crit) { playerDmg = Math.floor(playerDmg * 1.8); msg = `⭐ CRITICAL HIT! `; }
+    e.hp -= playerDmg;
+    addCombatLog(`${msg}You attack for ${playerDmg} damage.`);
+    showCombatAnim('⚔️');
+  }
+  else if (action === 'skill') {
+    const cls = CLASSES[p.cls];
+    if (p.mp < cls.skillMp) { addCombatLog('Not enough MP!'); return; }
+    p.mp -= cls.skillMp;
+    
+    if (p.cls === 'warrior') {
+      playerDmg = Math.floor((p.str * 2.5) - e.def/2 + Math.random()*8);
+      showCombatAnim('💢');
+    } else if (p.cls === 'mage') {
+      playerDmg = Math.floor((p.mag * 3) + Math.random()*10);
+      showCombatAnim('⚡');
+    } else if (p.cls === 'ranger') {
+      playerDmg = Math.floor((p.agi * 2) + p.str + Math.random()*6);
+      showCombatAnim('🎯');
+    } else if (p.cls === 'cleric') {
+      const heal = 40;
+      p.hp = Math.min(p.hpMax, p.hp + heal);
+      addCombatLog(`☀️ Holy Light! You heal ${heal} HP.`);
+      playerDmg = Math.floor(p.mag * 1.5); // smite damage
+      showCombatAnim('☀️');
+    }
+    e.hp -= playerDmg;
+    addCombatLog(`${cls.skillIcon} ${cls.skill}! ${playerDmg} damage.`);
+    document.getElementById('cb-skill').disabled = true;
+  }
+  else if (action === 'item') {
+    const potId = p.inventory.includes('potion') ? 'potion' : p.inventory.includes('bread') ? 'bread' : null;
+    if (!potId) { addCombatLog('No usable items!'); return; }
+    const item = ITEMS[potId];
+    item.use(p);
+    const idx = p.inventory.indexOf(potId);
+    p.inventory.splice(idx, 1);
+    addCombatLog(`You use ${item.name}.`);
+    const canUseItem = p.inventory.includes('potion') || p.inventory.includes('bread');
+    document.getElementById('cb-item').disabled = !canUseItem;
+    updateCombatHUD(); updateHUD();
+    // Enemy still attacks
+    enemyAttack();
+    return;
+  }
+  else if (action === 'flee') {
+    const fleeChance = 0.3 + (p.agi * 0.02);
+    if (Math.random() < fleeChance) {
+      addCombatLog('You successfully flee!');
+      addLog('You fled from battle.', 'system');
+      combat.over = true;
+      setTimeout(() => showScreen('game-screen'), 1000);
+      return;
+    } else {
+      addCombatLog('You fail to escape!');
+      enemyAttack();
+      updateCombatHUD(); updateHUD();
+      return;
+    }
+  }
+
+  updateCombatHUD(); updateHUD();
+
+  if (e.hp <= 0) {
+    combatVictory();
+    return;
+  }
+
+  enemyAttack();
+  updateCombatHUD(); updateHUD();
+
+  if (p.hp <= 0) { combatDefeat(); }
+}
+
+function enemyAttack() {
+  const p = G.player;
+  const e = combat.enemy;
+  const dodge = Math.random() < p.agi * 0.015;
+  if (dodge) { addCombatLog('⚡ You dodge the attack!'); return; }
+  const enemyDmg = Math.max(1, Math.floor(e.atk - p.def * 0.4 + Math.random()*5));
+  p.hp = Math.max(0, p.hp - enemyDmg);
+  addCombatLog(`${e.name} attacks you for ${enemyDmg} damage.`);
+}
+
+function combatVictory() {
+  combat.over = true;
+  const e = combat.enemy;
+  const p = G.player;
+  const goldBonus = Math.floor(Math.random()*e.gold*0.5);
+  const goldGained = e.gold + goldBonus;
+  p.gold += goldGained;
+  p.kills++;
+
+  addCombatLog(`✦ Victory! You defeated ${e.name}!`);
+  addCombatLog(`Gained ${e.xp} XP and ${goldGained} gold.`);
+  addLog(`Defeated ${e.name}. +${e.xp} XP, +${goldGained} 🪙`, 'loot');
+
+  // Random item drop
+  const drops = ['potion','bread','mpotion','emerald'];
+  if (Math.random() < 0.3) {
+    const drop = drops[Math.floor(Math.random()*drops.length)];
+    p.inventory.push(drop);
+    addCombatLog(`Loot: ${ITEMS[drop].name}!`);
+    addLog(`Found: ${ITEMS[drop].icon} ${ITEMS[drop].name}`, 'loot');
+  }
+
+  ['cb-attack','cb-skill','cb-item','cb-flee'].forEach(id => document.getElementById(id).disabled = true);
+  giveXP(e.xp);
+  setTimeout(() => { showScreen('game-screen'); renderInventory(); updateHUD(); }, 2000);
+}
+
+function combatDefeat() {
+  combat.over = true;
+  addCombatLog('☠ You have fallen…');
+  ['cb-attack','cb-skill','cb-item','cb-flee'].forEach(id => document.getElementById(id).disabled = true);
+  
+  // Respawn with penalty
+  const p = G.player;
+  p.hp = Math.floor(p.hpMax * 0.3);
+  p.gold = Math.max(0, Math.floor(p.gold * 0.7));
+  addLog('You wake near the village outskirts, wounded and robbed.', 'system');
+  
+  setTimeout(() => {
+    p.location = 'village';
+    loadScene('village');
+    renderMap();
+    showScreen('game-screen');
+    updateHUD();
+  }, 2200);
+}
+
+function showCombatAnim(icon) {
+  const el = document.getElementById('combat-anim');
+  el.textContent = icon;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 600);
+}
+
+// ══════════════════════════════════════
+//  LEVELING
+// ══════════════════════════════════════
+function giveXP(amount) {
+  const p = G.player;
+  p.xp += amount;
+  while (p.xp >= p.xpNext) {
+    p.xp -= p.xpNext;
+    p.level++;
+    p.xpNext = Math.floor(p.xpNext * 1.5);
+    levelUp();
+  }
+  updateHUD();
+}
+
+function levelUp() {
+  const p = G.player;
+  const gains = { hp: 15, mp: 8, str: 2, mag: 2, agi: 1, def: 2, lck: 1 };
+  const bonus = {warrior:{hp:20,str:3,def:2}, mage:{mp:15,mag:4}, ranger:{agi:3,lck:2}, cleric:{hp:10,mp:12,mag:2,def:1}};
+  const b = bonus[p.cls];
+  
+  p.hpMax += gains.hp + (b.hp||0);
+  p.mpMax += gains.mp + (b.mp||0);
+  p.hp = p.hpMax;
+  p.mp = p.mpMax;
+  p.str += gains.str + (b.str||0);
+  p.mag += gains.mag + (b.mag||0);
+  p.agi += gains.agi + (b.agi||0);
+  p.def += gains.def + (b.def||0);
+  p.lck += gains.lck + (b.lck||0);
+
+  // Unlock new locations
+  if (p.level >= 3) LOCATIONS.find(l=>l.id==='castle').locked = false;
+  if (p.level >= 4) LOCATIONS.find(l=>l.id==='tower').locked = false;
+  if (p.level >= 5) { LOCATIONS.find(l=>l.id==='swamp').locked = false; LOCATIONS.find(l=>l.id==='peak').locked = false; }
+
+  notify(`⭐ LEVEL ${p.level}! All stats increased!`);
+  addLog(`⭐ Level ${p.level}! You grow stronger.`, 'loot');
+  renderMap();
+}
+
+// ══════════════════════════════════════
+//  SHOP
+// ══════════════════════════════════════
+function goShop() {
+  document.getElementById('shop-gold-display').textContent = G.player.gold;
+  renderShop();
+  showScreen('shop-screen');
+}
+
+function renderShop() {
+  const container = document.getElementById('shop-items');
+  container.innerHTML = '';
+  SHOP_CATALOG.forEach(entry => {
+    const item = ITEMS[entry.item];
+    const canAfford = G.player.gold >= entry.price;
+    const div = document.createElement('div');
+    div.className = `shop-item${canAfford?'':' cant-afford'}`;
+    div.innerHTML = `
+      <div class="si-icon">${item.icon}</div>
+      <div class="si-name">${item.name}</div>
+      <div class="si-desc">${item.desc}</div>
+      <div class="si-price">🪙 ${entry.price}</div>
+    `;
+    if (canAfford) div.onclick = () => buyItem(entry.item, entry.price);
+    container.appendChild(div);
+  });
+}
+
+function buyItem(itemId, price) {
+  if (G.player.gold < price) return;
+  G.player.gold -= price;
+  G.player.inventory.push(itemId);
+  addLog(`Purchased ${ITEMS[itemId].name} for ${price} gold.`, 'loot');
+  document.getElementById('shop-gold-display').textContent = G.player.gold;
+  renderInventory();
+  updateHUD();
+  renderShop();
+  notify(`Bought ${ITEMS[itemId].name}!`);
+}
+
+function leaveShop() {
+  showScreen('game-screen');
+  updateHUD();
+}
+
+// ══════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════
+function notify(msg) {
+  const el = document.createElement('div');
+  el.className = 'notification';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+</script>
 </body>
 </html>

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>将軍 Shogun: Rise of Clans</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Cinzel:wght@400;700&display=swap');
+  :root {
+    --ink: #1a0a00; --parchment: #f4e4c1; --parchment-dark: #e8d4a0;
+    --red: #8b1a1a; --gold: #c8960c; --gold-light: #f0c040;
+    --blue: #1a3a5c; --green: #2d5a27;
+    --panel-bg: rgba(20,10,0,0.9); --border: #8b6914;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0500; color: var(--parchment); font-family: 'Noto Serif JP',serif; overflow: hidden; height: 100vh; width: 100vw; }
+
+  /* LOADING */
+  #loading { position:fixed;inset:0;z-index:999;background:#0a0500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px; }
+  #loading h1 { font-family:'Cinzel',serif;font-size:3rem;color:var(--gold-light);text-shadow:0 0 30px rgba(200,150,12,0.8);letter-spacing:4px; }
+  .jp-title { font-size:2rem;color:var(--red);letter-spacing:12px; }
+  .loader-bar { width:300px;height:6px;background:#2a1a00;border:1px solid var(--gold);border-radius:3px;overflow:hidden; }
+  .loader-fill { height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));width:0%;transition:width 0.3s;border-radius:3px; }
+
+  /* GAME LAYOUT */
+  #game { display:none;height:100vh;width:100vw;position:relative; }
+
+  /* TOP BAR */
+  #topbar { position:absolute;top:0;left:0;right:0;z-index:10;height:56px;background:linear-gradient(180deg,rgba(10,5,0,0.98),rgba(20,10,0,0.92));border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 20px;box-shadow:0 4px 20px rgba(0,0,0,0.8); }
+  #topbar h1 { font-family:'Cinzel',serif;font-size:1.3rem;color:var(--gold-light);letter-spacing:3px;text-shadow:0 0 15px rgba(200,150,12,0.6); }
+  .jp-sub { color:var(--red);font-size:0.85rem;letter-spacing:6px; }
+  .title-section { display:flex;align-items:center;gap:12px; }
+  .resources { display:flex;gap:20px;align-items:center; }
+  .res-item { display:flex;align-items:center;gap:8px;background:rgba(200,150,12,0.08);border:1px solid rgba(200,150,12,0.3);border-radius:4px;padding:4px 12px;font-size:0.85rem; }
+  .res-val { color:var(--gold-light);font-weight:700;min-width:40px;text-align:right; }
+  .res-label { color:#a08040;font-size:0.7rem; }
+  .turn-section { display:flex;align-items:center;gap:12px; }
+  .turn-info { text-align:right;font-size:0.8rem;color:#c0a060; }
+  .turn-num { color:var(--gold-light);font-size:1rem;font-weight:700; }
+  #endTurnBtn { background:linear-gradient(135deg,#6b1010,#8b1a1a);color:var(--gold-light);border:2px solid var(--gold);padding:8px 18px;font-family:'Cinzel',serif;font-size:0.85rem;cursor:pointer;letter-spacing:2px;transition:all 0.2s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%); }
+  #endTurnBtn:hover { background:linear-gradient(135deg,#8b1a1a,#c02020);box-shadow:0 0 20px rgba(200,50,50,0.5);transform:scale(1.05); }
+  #endTurnBtn:disabled { opacity:0.4;cursor:not-allowed;transform:none; }
+  .phase-indicator { display:inline-block;padding:2px 10px;font-size:0.65rem;letter-spacing:2px;border:1px solid var(--gold);color:var(--gold);border-radius:2px;margin-left:8px; }
+
+  /* MAP */
+  #mapContainer { position:absolute;top:56px;left:0;right:320px;bottom:0;overflow:hidden;background:#0d1f35; }
+  #mapSvg { position:absolute;inset:0;width:100%;height:100%; }
+
+  .province { cursor:pointer; }
+  .province polygon { stroke:rgba(200,150,12,0.4);stroke-width:1.5;transition:all 0.25s; }
+  .province:hover polygon { filter:brightness(1.4);stroke:var(--gold-light);stroke-width:2.5; }
+  .province.selected polygon { stroke:var(--gold-light);stroke-width:3;filter:brightness(1.6); }
+  .province-label { pointer-events:none;text-anchor:middle;dominant-baseline:middle;font-family:'Noto Serif JP',serif;font-size:9px;fill:rgba(255,240,200,0.9); }
+  .province-troops { pointer-events:none;text-anchor:middle;dominant-baseline:middle;font-size:9px;fill:rgba(255,255,180,0.85);font-weight:bold; }
+
+  .attack-arrow { stroke:#ff4040;stroke-width:3;fill:none;opacity:0.9;marker-end:url(#arrowhead); }
+
+  /* RIGHT PANEL */
+  #rightPanel { position:absolute;top:56px;right:0;bottom:0;width:320px;background:var(--panel-bg);border-left:2px solid var(--gold);overflow-y:auto;overflow-x:hidden; }
+  #rightPanel::-webkit-scrollbar { width:6px; }
+  #rightPanel::-webkit-scrollbar-thumb { background:var(--border);border-radius:3px; }
+  .panel-section { border-bottom:1px solid rgba(200,150,12,0.25);padding:14px 16px; }
+  .panel-title { font-family:'Cinzel',serif;font-size:0.75rem;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px; }
+  .panel-title::after { content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--gold),transparent); }
+
+  .prov-name { font-size:1.2rem;color:var(--gold-light);font-weight:700;margin-bottom:4px; }
+  .prov-jp { font-size:0.9rem;color:var(--red);margin-bottom:10px;letter-spacing:3px; }
+  .stat-row { display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:0.82rem;border-bottom:1px solid rgba(200,150,12,0.1); }
+  .stat-row:last-child { border-bottom:none; }
+  .stat-label { color:#a08040; }
+  .stat-val { color:var(--parchment);font-weight:600; }
+
+  .castle-display { width:100%;height:90px;background:rgba(0,0,0,0.4);border:1px solid rgba(200,150,12,0.3);border-radius:4px;margin:10px 0;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative; }
+  .castle-tier { position:absolute;bottom:4px;right:6px;font-size:0.65rem;color:var(--gold);letter-spacing:2px; }
+
+  .action-btn { width:100%;padding:10px 14px;margin-bottom:8px;background:linear-gradient(135deg,rgba(139,26,26,0.3),rgba(139,26,26,0.15));color:var(--parchment);border:1px solid rgba(200,150,12,0.4);cursor:pointer;font-family:'Noto Serif JP',serif;font-size:0.82rem;transition:all 0.2s;display:flex;align-items:center;justify-content:space-between;border-radius:2px; }
+  .action-btn:hover:not(:disabled) { background:linear-gradient(135deg,rgba(139,26,26,0.6),rgba(139,26,26,0.3));border-color:var(--gold);transform:translateX(3px); }
+  .action-btn:disabled { opacity:0.35;cursor:not-allowed; }
+  .btn-cost { color:var(--gold);font-size:0.75rem; }
+  .action-btn.atk-btn { background:linear-gradient(135deg,rgba(100,10,10,0.5),rgba(150,20,20,0.3));border-color:rgba(255,80,80,0.5); }
+  .action-btn.atk-btn:hover:not(:disabled) { background:linear-gradient(135deg,rgba(150,20,20,0.7),rgba(180,30,30,0.5));border-color:#ff5050;box-shadow:0 0 15px rgba(255,50,50,0.3); }
+
+  .clan-row { display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(200,150,12,0.12);font-size:0.8rem; }
+  .clan-color { width:12px;height:12px;border-radius:2px;flex-shrink:0; }
+  .clan-name { color:var(--parchment);flex:1; }
+  .clan-provs { color:var(--gold);min-width:20px;text-align:right; }
+
+  #eventLog { max-height:180px;overflow-y:auto;font-size:0.75rem;line-height:1.6; }
+  #eventLog::-webkit-scrollbar { width:4px; }
+  #eventLog::-webkit-scrollbar-thumb { background:var(--border); }
+  .log-entry { padding:3px 0;border-bottom:1px solid rgba(200,150,12,0.08);color:#b0a080; }
+  .log-entry.battle { color:#e08080; }
+  .log-entry.player { color:#80e080; }
+  .log-entry.ai { color:#e0a060; }
+  .log-turn { color:var(--gold);font-size:0.7rem;margin-right:4px; }
+
+  /* BATTLE OVERLAY */
+  #battleOverlay { display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;flex-direction:column; }
+  #battleOverlay.active { display:flex; }
+  .battle-arena { width:580px;background:linear-gradient(180deg,#1a0a00,#0a0500);border:2px solid var(--gold);padding:30px;text-align:center;clip-path:polygon(20px 0%,calc(100% - 20px) 0%,100% 20px,100% calc(100% - 20px),calc(100% - 20px) 100%,20px 100%,0% calc(100% - 20px),0% 20px); }
+  .battle-title { font-family:'Cinzel',serif;font-size:1.6rem;color:var(--red);letter-spacing:4px;text-shadow:0 0 20px rgba(200,50,50,0.8);margin-bottom:6px; }
+  .battle-subtitle { color:var(--gold);font-size:0.85rem;letter-spacing:2px;margin-bottom:20px; }
+  .battle-sides { display:flex;align-items:center;justify-content:space-around;margin:20px 0; }
+  .battle-side { text-align:center; }
+  .battle-warrior { font-size:4rem;margin-bottom:8px; }
+  .battle-clan { font-size:0.8rem;color:var(--gold);letter-spacing:2px; }
+  .battle-troops { font-size:1.4rem;font-weight:700;color:var(--parchment); }
+  .battle-vs { font-family:'Cinzel',serif;font-size:2rem;color:var(--red);text-shadow:0 0 20px rgba(200,50,50,0.8); }
+  .battle-bar-wrap { width:100%;background:rgba(0,0,0,0.4);border:1px solid rgba(200,150,12,0.3);height:16px;border-radius:8px;overflow:hidden;margin:10px 0;display:flex; }
+  .battle-bar-atk { background:linear-gradient(90deg,var(--red),#ff4040);transition:width 0.8s; }
+  .battle-bar-def { background:linear-gradient(90deg,var(--blue),#4080c0);transition:width 0.8s;margin-left:auto; }
+  @keyframes shakeA { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px) rotate(-1deg)} 75%{transform:translateX(8px) rotate(1deg)} }
+  .shaking { animation:shakeA 0.15s 5; }
+  .battle-result { font-family:'Cinzel',serif;font-size:1.8rem;margin:10px 0;font-weight:700; }
+  .battle-result.victory { color:var(--gold-light);text-shadow:0 0 20px rgba(200,200,50,0.8); }
+  .battle-result.defeat { color:var(--red);text-shadow:0 0 20px rgba(200,50,50,0.8); }
+  .battle-details { color:#a09060;font-size:0.8rem;margin:5px 0; }
+  #battleContinueBtn { margin-top:20px;padding:12px 36px;background:linear-gradient(135deg,#3a1a00,#5a2a00);color:var(--gold-light);border:2px solid var(--gold);font-family:'Cinzel',serif;font-size:1rem;letter-spacing:3px;cursor:pointer;transition:all 0.2s;clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%); }
+  #battleContinueBtn:hover { background:linear-gradient(135deg,#5a2a00,#7a3a00);box-shadow:0 0 20px rgba(200,150,12,0.4); }
+
+  /* NOTIFICATION */
+  #notification { position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:200;background:linear-gradient(135deg,rgba(20,10,0,0.95),rgba(30,15,0,0.95));border:1px solid var(--gold);color:var(--gold-light);padding:10px 24px;font-size:0.85rem;letter-spacing:2px;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;clip-path:polygon(12px 0%,calc(100% - 12px) 0%,100% 50%,calc(100% - 12px) 100%,12px 100%,0% 50%); }
+  #notification.show { opacity:1; }
+
+  /* GAME OVER */
+  #gameOver { display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;flex-direction:column;gap:20px; }
+  #gameOver.active { display:flex; }
+  #gameOver h2 { font-family:'Cinzel',serif;font-size:3rem;letter-spacing:6px; }
+  .go-sub { color:#a09060;font-size:1rem;letter-spacing:3px; }
+  .go-restart { padding:14px 40px;background:linear-gradient(135deg,#3a1a00,#6b1010);color:var(--gold-light);border:2px solid var(--gold);font-family:'Cinzel',serif;font-size:1rem;letter-spacing:3px;cursor:pointer;transition:all 0.2s;margin-top:10px; }
+  .go-restart:hover { box-shadow:0 0 30px rgba(200,150,12,0.5); }
+
+  .help-text { color:#705040;font-size:0.8rem;text-align:center;padding:10px 0; }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="jp-title">将 軍</div>
+  <h1>SHOGUN: RISE OF CLANS</h1>
+  <p style="color:#a08040;font-size:0.85rem;letter-spacing:3px;margin-top:-10px;">封建日本の戦略</p>
+  <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
+  <p style="color:#605040;font-size:0.75rem;" id="loadStatus">Initializing...</p>
+</div>
+
+<div id="game">
+  <div id="topbar">
+    <div class="title-section">
+      <div>
+        <h1>将軍 SHOGUN</h1>
+        <div class="jp-sub">封建日本</div>
+      </div>
+      <span class="phase-indicator" id="phaseIndicator">PLAYER TURN</span>
+    </div>
+    <div class="resources">
+      <div class="res-item">💰 <div><div class="res-val" id="resGold">1200</div><div class="res-label">KOKU</div></div></div>
+      <div class="res-item">🏯 <div><div class="res-val" id="resProvs">3</div><div class="res-label">PROVINCES</div></div></div>
+      <div class="res-item">⚔️ <div><div class="res-val" id="resTroops">450</div><div class="res-label">SAMURAI</div></div></div>
+    </div>
+    <div class="turn-section">
+      <div class="turn-info">
+        <span class="turn-num" id="turnNum">Year 1560</span>
+        <span>Turn <span id="turnCount">1</span></span>
+      </div>
+      <button id="endTurnBtn">END TURN ▶</button>
+    </div>
+  </div>
+
+  <div id="mapContainer">
+    <svg id="mapSvg" viewBox="0 0 760 720">
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0,10 3.5,0 7" fill="#ff4040"/>
+        </marker>
+        <radialGradient id="seaGrad" cx="50%" cy="50%" r="80%">
+          <stop offset="0%" stop-color="#1a3a5c"/>
+          <stop offset="100%" stop-color="#0d1a2e"/>
+        </radialGradient>
+        <pattern id="waves" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M0,20 Q10,15 20,20 Q30,25 40,20" stroke="rgba(100,150,200,0.08)" stroke-width="1" fill="none"/>
+        </pattern>
+      </defs>
+      <rect width="760" height="720" fill="url(#seaGrad)"/>
+      <rect width="760" height="720" fill="url(#waves)"/>
+      <text x="80" y="380" fill="rgba(100,150,200,0.25)" font-size="13" font-style="italic" font-family="Georgia">Sea of Japan</text>
+      <text x="560" y="520" fill="rgba(100,150,200,0.25)" font-size="11" font-style="italic" font-family="Georgia">Pacific</text>
+      <g id="provinces"></g>
+      <g id="arrows"></g>
+    </svg>
+  </div>
+
+  <div id="rightPanel">
+    <div class="panel-section" id="provinceInfo">
+      <div class="panel-title">省 PROVINCE</div>
+      <div class="help-text">Click a province on the map<br>to view details &amp; take actions</div>
+    </div>
+    <div class="panel-section" id="actionsPanel">
+      <div class="panel-title">行動 ACTIONS</div>
+      <div id="actionButtons"><div class="help-text">Select your province</div></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-title">氏族 CLANS</div>
+      <div id="clanList"></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-title">戦記 WAR LOG</div>
+      <div id="eventLog"></div>
+    </div>
+  </div>
+</div>
+
+<div id="battleOverlay">
+  <div class="battle-arena" id="battleArena">
+    <div class="battle-title">⚔ BATTLE ⚔</div>
+    <div class="battle-subtitle" id="battleSubtitle">戦い</div>
+    <div class="battle-sides">
+      <div class="battle-side">
+        <div class="battle-warrior">🗡️</div>
+        <div class="battle-clan" id="atkClanName">—</div>
+        <div class="battle-troops" id="atkTroops">0</div>
+        <div style="font-size:0.7rem;color:#a09060">troops</div>
+      </div>
+      <div class="battle-vs">VS</div>
+      <div class="battle-side">
+        <div class="battle-warrior">🛡️</div>
+        <div class="battle-clan" id="defClanName">—</div>
+        <div class="battle-troops" id="defTroops">0</div>
+        <div style="font-size:0.7rem;color:#a09060">troops</div>
+      </div>
+    </div>
+    <div class="battle-bar-wrap">
+      <div class="battle-bar-atk" id="bBarAtk" style="width:50%"></div>
+      <div class="battle-bar-def" id="bBarDef" style="width:50%"></div>
+    </div>
+    <div id="battleResultDiv" style="display:none">
+      <div class="battle-result" id="battleResult"></div>
+      <div class="battle-details" id="battleDetails"></div>
+    </div>
+    <button id="battleContinueBtn" style="display:none">CONTINUE</button>
+  </div>
+</div>
+
+<div id="notification"></div>
+
+<div id="gameOver">
+  <div style="font-size:3rem">🏯</div>
+  <h2 id="goTitle">VICTORY</h2>
+  <div class="go-sub" id="goSub"></div>
+  <button class="go-restart" onclick="location.reload()">PLAY AGAIN</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  SHOGUN: RISE OF CLANS
+// ══════════════════════════════════════════════
+
+const CLANS = {
+  player:  { name:'Tokugawa', jp:'徳川', color:'#2a5c8a', text:'#80c0ff', k:'⚜' },
+  oda:     { name:'Oda',      jp:'織田', color:'#8a2a2a', text:'#ff8080', k:'✦' },
+  takeda:  { name:'Takeda',   jp:'武田', color:'#8a5a2a', text:'#ffb060', k:'◆' },
+  uesugi:  { name:'Uesugi',   jp:'上杉', color:'#2a6a2a', text:'#80e080', k:'❋' },
+  mori:    { name:'Mōri',     jp:'毛利', color:'#5a2a8a', text:'#c080ff', k:'✿' },
+  shimazu: { name:'Shimazu',  jp:'島津', color:'#2a7a6a', text:'#60e0d0', k:'✸' },
+  hojo:    { name:'Hōjō',     jp:'北条', color:'#6a6a2a', text:'#e0e060', k:'⬡' },
+  neutral: { name:'Neutral',  jp:'中立', color:'#3d4a33', text:'#b0b090', k:'○' },
+};
+
+// Province definitions — feudal Japan provinces with approximate shapes
+const PDATA = [
+  // KYUSHU
+  {id:'satsuma',  name:'Satsuma',  jp:'薩摩', pts:[[165,622],[195,602],[216,618],[212,648],[182,658],[165,643]], cx:191,cy:630, owner:'shimazu', troops:280, econ:3, castle:2},
+  {id:'osumi',    name:'Ōsumi',   jp:'大隅', pts:[[218,610],[248,595],[264,613],[256,642],[225,648],[215,632]], cx:238,cy:622, owner:'shimazu', troops:200, econ:2, castle:1},
+  {id:'higo',     name:'Higo',    jp:'肥後', pts:[[175,572],[208,556],[228,570],[224,600],[198,610],[175,598]], cx:201,cy:582, owner:'neutral', troops:130, econ:3, castle:1},
+  {id:'hizen',    name:'Hizen',   jp:'肥前', pts:[[148,547],[178,537],[196,552],[190,577],[165,582],[148,568]], cx:172,cy:560, owner:'neutral', troops:100, econ:2, castle:1},
+  {id:'buzen',    name:'Buzen',   jp:'豊前', pts:[[210,520],[244,510],[260,528],[252,555],[220,558],[207,538]], cx:232,cy:534, owner:'oda',     troops:180, econ:3, castle:1},
+  {id:'chikugo',  name:'Chikugo', jp:'筑後', pts:[[172,508],[205,498],[216,516],[207,536],[180,540],[164,522]], cx:191,cy:519, owner:'neutral', troops:90,  econ:2, castle:1},
+  // SHIKOKU
+  {id:'tosa',     name:'Tosa',    jp:'土佐', pts:[[275,560],[320,545],[340,566],[330,596],[295,601],[270,583]], cx:305,cy:573, owner:'neutral', troops:130, econ:2, castle:1},
+  {id:'iyo',      name:'Iyo',     jp:'伊予', pts:[[256,526],[296,516],[310,534],[302,558],[270,560],[249,540]], cx:281,cy:538, owner:'mori',    troops:160, econ:3, castle:1},
+  {id:'sanuki',   name:'Sanuki',  jp:'讃岐', pts:[[297,502],[336,493],[348,509],[338,529],[306,530],[291,515]], cx:320,cy:512, owner:'neutral', troops:100, econ:2, castle:1},
+  {id:'awa',      name:'Awa',     jp:'阿波', pts:[[341,510],[370,503],[382,520],[373,543],[346,545],[334,528]], cx:358,cy:523, owner:'neutral', troops:80,  econ:2, castle:1},
+  // CHUGOKU
+  {id:'aki',      name:'Aki',     jp:'安芸', pts:[[256,480],[291,470],[308,486],[301,512],[270,515],[250,498]], cx:279,cy:492, owner:'mori',    troops:220, econ:3, castle:2},
+  {id:'suo',      name:'Suō',    jp:'周防', pts:[[230,460],[265,450],[280,466],[273,490],[244,493],[225,477]], cx:253,cy:471, owner:'mori',    troops:190, econ:2, castle:1},
+  {id:'nagato',   name:'Nagato',  jp:'長門', pts:[[205,436],[238,428],[250,446],[244,466],[215,470],[200,453]], cx:225,cy:450, owner:'mori',    troops:150, econ:2, castle:1},
+  {id:'bingo',    name:'Bingo',   jp:'備後', pts:[[286,460],[318,452],[332,468],[323,492],[292,494],[278,478]], cx:306,cy:473, owner:'neutral', troops:100, econ:2, castle:1},
+  {id:'bicchu',   name:'Bicchū', jp:'備中', pts:[[320,446],[352,438],[366,456],[357,478],[325,480],[313,462]], cx:339,cy:459, owner:'neutral', troops:110, econ:2, castle:1},
+  {id:'bizen',    name:'Bizen',   jp:'備前', pts:[[355,433],[388,426],[400,443],[393,463],[360,466],[348,450]], cx:374,cy:446, owner:'hojo',    troops:140, econ:3, castle:1},
+  // KINAI
+  {id:'settsu',   name:'Settsu',  jp:'摂津', pts:[[380,408],[414,401],[430,418],[421,441],[390,444],[374,425]], cx:402,cy:422, owner:'neutral', troops:120, econ:4, castle:1},
+  {id:'yamashiro',name:'Yamashiro',jp:'山城',pts:[[411,390],[445,382],[460,400],[451,422],[418,425],[405,407]], cx:432,cy:404, owner:'neutral', troops:150, econ:4, castle:2},
+  {id:'yamato',   name:'Yamato',  jp:'大和', pts:[[438,408],[470,401],[485,419],[476,441],[445,445],[432,425]], cx:458,cy:422, owner:'neutral', troops:110, econ:3, castle:1},
+  {id:'ise',      name:'Ise',     jp:'伊勢', pts:[[468,390],[505,382],[520,401],[511,423],[478,427],[462,408]], cx:491,cy:404, owner:'oda',     troops:200, econ:4, castle:2},
+  {id:'owari',    name:'Owari',   jp:'尾張', pts:[[481,359],[515,351],[530,368],[521,390],[488,395],[473,376]], cx:501,cy:372, owner:'oda',     troops:320, econ:5, castle:3},
+  {id:'mikawa',   name:'Mikawa',  jp:'三河', pts:[[515,356],[550,348],[565,366],[556,388],[523,392],[509,374]], cx:537,cy:369, owner:'player',  troops:240, econ:4, castle:2},
+  {id:'totomi',   name:'Tōtōmi', jp:'遠江', pts:[[551,350],[585,343],[600,360],[590,382],[557,386],[543,366]], cx:571,cy:363, owner:'player',  troops:175, econ:3, castle:1},
+  {id:'suruga',   name:'Suruga',  jp:'駿河', pts:[[586,343],[618,336],[634,353],[625,375],[591,379],[578,358]], cx:607,cy:357, owner:'player',  troops:155, econ:3, castle:2},
+  // EAST
+  {id:'kai',      name:'Kai',     jp:'甲斐', pts:[[601,309],[638,301],[655,319],[646,343],[611,347],[595,326]], cx:626,cy:323, owner:'takeda',  troops:350, econ:3, castle:2},
+  {id:'shinano',  name:'Shinano', jp:'信濃', pts:[[561,296],[600,286],[618,303],[609,329],[571,333],[552,314]], cx:585,cy:309, owner:'takeda',  troops:270, econ:3, castle:2},
+  {id:'kozuke',   name:'Kōzuke', jp:'上野', pts:[[606,271],[645,263],[660,281],[651,306],[615,309],[598,288]], cx:629,cy:285, owner:'uesugi',  troops:220, econ:3, castle:1},
+  {id:'musashi',  name:'Musashi', jp:'武蔵', pts:[[636,261],[672,253],[688,271],[679,295],[642,299],[628,278]], cx:658,cy:275, owner:'hojo',    troops:260, econ:4, castle:2},
+  {id:'sagami',   name:'Sagami',  jp:'相模', pts:[[650,293],[686,286],[700,303],[693,326],[657,329],[644,309]], cx:672,cy:308, owner:'hojo',    troops:200, econ:3, castle:2},
+  {id:'shimosa',  name:'Shimōsa',jp:'下総', pts:[[666,246],[700,239],[715,256],[706,279],[671,283],[656,263]], cx:686,cy:260, owner:'hojo',    troops:170, econ:3, castle:1},
+  // CHUBU / NORTH
+  {id:'echigo',   name:'Echigo',  jp:'越後', pts:[[568,259],[608,251],[622,269],[613,296],[573,299],[555,278]], cx:589,cy:274, owner:'uesugi',  troops:300, econ:3, castle:2},
+  {id:'etchu',    name:'Etchū',  jp:'越中', pts:[[531,271],[569,263],[581,281],[571,306],[533,309],[517,289]], cx:550,cy:285, owner:'neutral', troops:110, econ:2, castle:1},
+  {id:'kaga',     name:'Kaga',   jp:'加賀', pts:[[493,279],[531,271],[543,289],[533,313],[495,316],[479,297]], cx:511,cy:294, owner:'neutral', troops:100, econ:2, castle:1},
+  {id:'shimozuke',name:'Shimotsuke',jp:'下野',pts:[[641,233],[679,226],[693,243],[683,269],[645,273],[629,253]], cx:661,cy:249, owner:'uesugi',  troops:150, econ:2, castle:1},
+  {id:'dewa',     name:'Dewa',   jp:'出羽', pts:[[619,211],[659,203],[673,221],[663,249],[624,253],[607,233]], cx:640,cy:228, owner:'uesugi',  troops:200, econ:2, castle:1},
+  {id:'mutsu',    name:'Mutsu',  jp:'陸奥', pts:[[649,176],[690,169],[705,187],[695,215],[656,219],[639,199]], cx:672,cy:194, owner:'neutral', troops:130, econ:2, castle:1},
+];
+
+const ADJ = {
+  satsuma:['osumi','higo'], osumi:['satsuma','higo','buzen'], higo:['satsuma','osumi','hizen','chikugo','buzen'],
+  hizen:['higo','chikugo'], buzen:['osumi','higo','chikugo','suo'], chikugo:['higo','hizen','buzen'],
+  tosa:['iyo','awa'], iyo:['tosa','sanuki','awa','suo'], sanuki:['iyo','awa','bingo'], awa:['tosa','iyo','sanuki','bingo'],
+  suo:['buzen','nagato','aki','bingo','iyo'], nagato:['suo','aki'], aki:['suo','nagato','bingo','bicchu'],
+  bingo:['sanuki','awa','bicchu','aki','suo'], bicchu:['bingo','bizen','aki','settsu'], bizen:['bicchu','settsu','yamashiro'],
+  settsu:['bicchu','bizen','yamashiro','yamato','ise'], yamashiro:['bizen','settsu','yamato','ise','owari'],
+  yamato:['settsu','yamashiro','ise'], ise:['settsu','yamashiro','yamato','owari','mikawa'],
+  owari:['ise','yamashiro','mikawa','shinano','kaga'], mikawa:['ise','owari','totomi','shinano'],
+  totomi:['mikawa','suruga','shinano'], suruga:['totomi','kai','shinano'],
+  kai:['suruga','shinano','kozuke','musashi','sagami'], shinano:['owari','mikawa','totomi','suruga','kai','kozuke','etchu','kaga','echigo'],
+  kozuke:['kai','shinano','musashi','echigo','shimozuke'], musashi:['kai','sagami','shimosa','kozuke','shimozuke'],
+  sagami:['kai','musashi','shimosa'], shimosa:['musashi','sagami','shimozuke'],
+  echigo:['shinano','kozuke','dewa','etchu','shimozuke'], etchu:['shinano','echigo','kaga'],
+  kaga:['owari','shinano','etchu'], shimozuke:['kozuke','musashi','shimosa','echigo','dewa'],
+  dewa:['echigo','mutsu','shimozuke'], mutsu:['dewa'],
+};
+
+// Game state
+let G = {
+  turn:1, gold:1200, phase:'player', selected:null,
+  provinces: Object.fromEntries(PDATA.map(p => [p.id, {...p}]))
+};
+
+const svgNS = 'http://www.w3.org/2000/svg';
+
+function pts2str(pts) { return pts.map(([x,y])=>`${x},${y}`).join(' '); }
+function clanColor(owner) { return (CLANS[owner]||CLANS.neutral).color; }
+function castleEmoji(t) { return t>=3?'🏯':t===2?'🏰':'🏛'; }
+
+// ── RENDER ──
+function render() {
+  const g = document.getElementById('provinces');
+  g.innerHTML = '';
+  Object.values(G.provinces).forEach(p => {
+    const grp = document.createElementNS(svgNS,'g');
+    grp.setAttribute('class','province'+(G.selected===p.id?' selected':''));
+    grp.setAttribute('data-id',p.id);
+
+    const poly = document.createElementNS(svgNS,'polygon');
+    poly.setAttribute('points', pts2str(p.pts));
+    poly.setAttribute('fill', clanColor(p.owner));
+    grp.appendChild(poly);
+
+    // Border highlight for player provinces
+    if(p.owner==='player') {
+      const poly2 = document.createElementNS(svgNS,'polygon');
+      poly2.setAttribute('points', pts2str(p.pts));
+      poly2.setAttribute('fill','none');
+      poly2.setAttribute('stroke','rgba(128,192,255,0.6)');
+      poly2.setAttribute('stroke-width','2');
+      grp.appendChild(poly2);
+    }
+
+    const lbl = document.createElementNS(svgNS,'text');
+    lbl.setAttribute('x',p.cx); lbl.setAttribute('y',p.cy-6);
+    lbl.setAttribute('class','province-label'); lbl.textContent=p.jp;
+    grp.appendChild(lbl);
+
+    const tr = document.createElementNS(svgNS,'text');
+    tr.setAttribute('x',p.cx); tr.setAttribute('y',p.cy+8);
+    tr.setAttribute('class','province-troops'); tr.textContent='⚔'+p.troops;
+    grp.appendChild(tr);
+
+    grp.addEventListener('click',()=>select(p.id));
+    g.appendChild(grp);
+  });
+}
+
+// ── SELECTION ──
+function select(id) {
+  if(G.phase!=='player') return;
+  G.selected=id;
+  render();
+  renderPanel(id);
+}
+
+function renderPanel(id) {
+  const p = G.provinces[id];
+  if(!p) return;
+  const cl = CLANS[p.owner]||CLANS.neutral;
+
+  document.getElementById('provinceInfo').innerHTML = `
+    <div class="panel-title">省 PROVINCE</div>
+    <div class="prov-name">${p.name}</div>
+    <div class="prov-jp">${p.jp}</div>
+    <div class="castle-display"><span>${castleEmoji(p.castle)}</span><span class="castle-tier">TIER ${p.castle}</span></div>
+    <div style="color:${cl.text};font-size:0.85rem;margin-bottom:8px">${cl.k} ${cl.name} (${cl.jp})</div>
+    <div class="stat-row"><span class="stat-label">⚔ Samurai</span><span class="stat-val">${p.troops}</span></div>
+    <div class="stat-row"><span class="stat-label">🌾 Economy</span><span class="stat-val">${'★'.repeat(p.econ)}${'☆'.repeat(5-p.econ)}</span></div>
+    <div class="stat-row"><span class="stat-label">🏯 Castle</span><span class="stat-val">Tier ${p.castle}</span></div>
+    <div class="stat-row"><span class="stat-label">💰 Income</span><span class="stat-val">${p.econ*50} koku/turn</span></div>`;
+
+  const ab = document.getElementById('actionButtons');
+  ab.innerHTML='';
+  if(p.owner==='player') {
+    btn(ab,'⚔ Recruit Samurai (+50)','100 koku',G.gold<100,()=>recruit(id));
+    const uc=[300,600,0][p.castle-1];
+    btn(ab,`🏯 Upgrade Castle ${p.castle<3?'→ Tier '+(p.castle+1):'(MAX)'}`,p.castle<3?uc+' koku':'MAX',G.gold<uc||p.castle>=3,()=>upgrade(id));
+
+    const adj=ADJ[id]||[];
+    const enemies=adj.filter(a=>G.provinces[a]&&G.provinces[a].owner!=='player');
+    if(enemies.length){
+      const sep=document.createElement('div'); sep.style.cssText='color:#705040;font-size:0.7rem;padding:6px 0 2px;letter-spacing:2px;'; sep.textContent='⚔ ATTACK:'; ab.appendChild(sep);
+      enemies.forEach(eid=>{
+        const ep=G.provinces[eid];
+        const ec=CLANS[ep.owner]||CLANS.neutral;
+        btn(ab,`<span style="color:${ec.text}">${ep.jp} ${ep.name}</span>`,`${ep.troops} 兵`,p.troops<=50,()=>attack(id,eid),'atk-btn');
+      });
+    }
+
+    const friends=adj.filter(a=>G.provinces[a]&&G.provinces[a].owner==='player');
+    if(friends.length){
+      const sep=document.createElement('div'); sep.style.cssText='color:#705040;font-size:0.7rem;padding:6px 0 2px;letter-spacing:2px;'; sep.textContent='↔ REINFORCE FROM:'; ab.appendChild(sep);
+      friends.forEach(fid=>{
+        const fp=G.provinces[fid];
+        btn(ab,`← ${fp.jp} (${fp.troops})`,'Move 100',fp.troops<150,()=>reinforce(fid,id));
+      });
+    }
+  } else {
+    ab.innerHTML='<div class="help-text">Select an adjacent<br>owned province to attack</div>';
+  }
+}
+
+function btn(parent, html, cost, disabled, cb, extra='') {
+  const b=document.createElement('button');
+  b.className='action-btn '+extra;
+  b.innerHTML=`<span>${html}</span><span class="btn-cost">${cost}</span>`;
+  b.disabled=disabled;
+  b.onclick=cb;
+  parent.appendChild(b);
+}
+
+// ── PLAYER ACTIONS ──
+function recruit(id) {
+  if(G.gold<100) return notify('Not enough koku!');
+  G.gold-=100; G.provinces[id].troops+=50;
+  log(`Recruited 50 samurai in ${G.provinces[id].name}`,'player');
+  updateRes(); render(); renderPanel(id);
+}
+function upgrade(id) {
+  const p=G.provinces[id], costs=[300,600,0];
+  const c=costs[p.castle-1];
+  if(!c||G.gold<c) return notify('Not enough koku!');
+  G.gold-=c; p.castle++;
+  log(`${p.name} castle upgraded to Tier ${p.castle}!`,'player');
+  notify(`🏯 Castle upgraded to Tier ${p.castle}!`);
+  updateRes(); render(); renderPanel(id);
+}
+function reinforce(from,to) {
+  const f=G.provinces[from];
+  if(f.troops<150) return notify('Need 150+ troops to send reinforcements!');
+  f.troops-=100; G.provinces[to].troops+=100;
+  log(`Reinforced ${G.provinces[to].name} from ${f.name}`,'player');
+  render(); renderPanel(to);
+}
+function attack(fromId,toId) {
+  if(G.phase!=='player') return;
+  if(G.provinces[fromId].troops<=50) return notify('Need 50+ troops to attack!');
+  battle(fromId,toId,true,()=>{ render(); renderPanel(G.selected||fromId); updateRes(); checkEnd(); });
+}
+
+// ── BATTLE ──
+function battle(fromId,toId,isPlayer,cb) {
+  const atk=G.provinces[fromId], def=G.provinces[toId];
+  const ac=CLANS[atk.owner]||CLANS.neutral, dc=CLANS[def.owner]||CLANS.neutral;
+  const ov=document.getElementById('battleOverlay'), arena=document.getElementById('battleArena');
+
+  document.getElementById('battleSubtitle').textContent=`${atk.name} → ${def.name}`;
+  document.getElementById('atkClanName').textContent=`${ac.k} ${ac.name}`;
+  document.getElementById('defClanName').textContent=`${dc.k} ${dc.name}`;
+  document.getElementById('atkTroops').textContent=atk.troops;
+  document.getElementById('defTroops').textContent=def.troops;
+  document.getElementById('battleResultDiv').style.display='none';
+  document.getElementById('battleContinueBtn').style.display='none';
+  const tot=atk.troops+def.troops;
+  document.getElementById('bBarAtk').style.width=Math.round(atk.troops/tot*100)+'%';
+  document.getElementById('bBarDef').style.width=Math.round(def.troops/tot*100)+'%';
+  ov.classList.add('active');
+
+  setTimeout(()=>{
+    arena.classList.add('shaking');
+    setTimeout(()=>arena.classList.remove('shaking'),900);
+    const cb2=1+(def.castle-1)*0.22;
+    const ap=atk.troops*(0.75+Math.random()*0.55);
+    const dp=def.troops*cb2*(0.68+Math.random()*0.55);
+    const wins=ap>dp;
+    const aLoss=Math.round(Math.min(atk.troops-1, def.troops*0.28+Math.random()*def.troops*0.28));
+    atk.troops=Math.max(1,atk.troops-aLoss);
+    const res=document.getElementById('battleResult'), det=document.getElementById('battleDetails');
+    document.getElementById('battleResultDiv').style.display='block';
+    if(wins){
+      const prev=def.owner; def.owner=atk.owner; def.troops=Math.max(10,Math.round(atk.troops*0.3));
+      res.className='battle-result victory'; res.textContent='⚔ VICTORY ⚔';
+      det.textContent=`${def.name} captured! Lost ${aLoss} samurai.`;
+      log(`${ac.name} conquered ${def.name} from ${(CLANS[prev]||CLANS.neutral).name}!`, atk.owner==='player'?'player':'ai');
+    } else {
+      const dLoss=Math.round(atk.troops*0.2+Math.random()*atk.troops*0.1);
+      def.troops=Math.max(10,def.troops-dLoss);
+      res.className='battle-result defeat'; res.textContent=isPlayer?'🛡 REPELLED 🛡':'⚔ REPELLED ⚔';
+      det.textContent=`Attack failed! Lost ${aLoss} samurai.`;
+      log(`${ac.name} attack on ${def.name} repelled! (${aLoss} losses)`,'battle');
+    }
+    const nt=atk.troops+def.troops;
+    document.getElementById('atkTroops').textContent=atk.troops;
+    document.getElementById('defTroops').textContent=def.troops;
+    document.getElementById('bBarAtk').style.width=Math.round(atk.troops/nt*100)+'%';
+    document.getElementById('bBarDef').style.width=Math.round(def.troops/nt*100)+'%';
+    document.getElementById('battleContinueBtn').style.display='inline-block';
+    document.getElementById('battleContinueBtn').onclick=()=>{ ov.classList.remove('active'); if(cb)cb(); };
+  },1100);
+}
+
+// ── AI TURN ──
+function doAiTurn() {
+  G.phase='ai';
+  document.getElementById('phaseIndicator').textContent='AI TURN';
+  document.getElementById('endTurnBtn').disabled=true;
+  const acts=[];
+  ['oda','takeda','uesugi','mori','shimazu','hojo'].forEach(clan=>{
+    const myProvs=Object.values(G.provinces).filter(p=>p.owner===clan);
+    if(!myProvs.length) return;
+    // income & recruit
+    const inc=myProvs.reduce((s,p)=>s+p.econ*50,0);
+    const big=myProvs.sort((a,b)=>b.troops-a.troops)[0];
+    big.troops+=Math.round(20+inc/120);
+    // find attacks
+    myProvs.forEach(p=>{
+      if(p.troops<110) return;
+      const adj=(ADJ[p.id]||[]).filter(a=>G.provinces[a]&&G.provinces[a].owner!==clan);
+      if(adj.length&&Math.random()<0.42) {
+        const t=adj.sort((a,b)=>G.provinces[a].troops-G.provinces[b].troops)[0];
+        acts.push({from:p.id,to:t});
+      }
+    });
+  });
+  let i=0;
+  function next(){
+    if(i>=acts.length){finishAi();return;}
+    const a=acts[i++];
+    const fr=G.provinces[a.from],to=G.provinces[a.to];
+    if(!fr||!to||fr.owner===to.owner){next();return;}
+    showArrow(a.from,a.to,()=>{
+      if(to.owner==='player'){
+        battle(a.from,a.to,false,()=>{render();updateRes();checkEnd();setTimeout(next,300);});
+      } else {
+        silentBattle(a.from,a.to); render(); setTimeout(next,180);
+      }
+    });
+  }
+  setTimeout(next,500);
+}
+
+function silentBattle(fId,tId){
+  const a=G.provinces[fId],d=G.provinces[tId]; if(!a||!d)return;
+  const cb=1+(d.castle-1)*0.22;
+  const ap=a.troops*(0.75+Math.random()*0.55), dp=d.troops*cb*(0.68+Math.random()*0.55);
+  const al=Math.round(Math.min(a.troops-1,d.troops*0.25+Math.random()*d.troops*0.22));
+  a.troops=Math.max(1,a.troops-al);
+  if(ap>dp){
+    const prev=d.owner; d.owner=a.owner; d.troops=Math.max(10,Math.round(a.troops*0.25));
+    log(`${(CLANS[a.owner]||CLANS.neutral).name} captured ${d.name} from ${(CLANS[prev]||CLANS.neutral).name}`,'ai');
+  } else {
+    d.troops=Math.max(10,d.troops-Math.round(a.troops*0.18));
+    a.troops=Math.max(1,a.troops-Math.round(a.troops*0.12));
+  }
+}
+
+function showArrow(fId,tId,cb){
+  const f=G.provinces[fId],t=G.provinces[tId];
+  const ag=document.getElementById('arrows');
+  const l=document.createElementNS(svgNS,'line');
+  l.setAttribute('x1',f.cx);l.setAttribute('y1',f.cy);
+  l.setAttribute('x2',t.cx);l.setAttribute('y2',t.cy);
+  l.setAttribute('class','attack-arrow');
+  ag.appendChild(l);
+  setTimeout(()=>{try{ag.removeChild(l);}catch(e){}if(cb)cb();},550);
+}
+
+function finishAi(){
+  const myP=Object.values(G.provinces).filter(p=>p.owner==='player');
+  const inc=myP.reduce((s,p)=>s+p.econ*50,0);
+  G.gold+=inc;
+  G.turn++;
+  G.phase='player';
+  document.getElementById('phaseIndicator').textContent='PLAYER TURN';
+  document.getElementById('endTurnBtn').disabled=false;
+  document.getElementById('turnCount').textContent=G.turn;
+  document.getElementById('turnNum').textContent=`Year ${1559+G.turn}`;
+  log(`Turn ${G.turn}: +${inc} koku collected.`,'player');
+  updateRes(); render();
+  if(G.selected) renderPanel(G.selected);
+  checkEnd();
+}
+
+// ── RESOURCES ──
+function updateRes(){
+  const pp=Object.values(G.provinces).filter(p=>p.owner==='player');
+  G.gold=Math.max(0,G.gold);
+  document.getElementById('resGold').textContent=G.gold.toLocaleString();
+  document.getElementById('resProvs').textContent=pp.length;
+  document.getElementById('resTroops').textContent=pp.reduce((s,p)=>s+p.troops,0);
+  // Clan list
+  const cnt={};
+  Object.values(G.provinces).forEach(p=>{cnt[p.owner]=(cnt[p.owner]||0)+1;});
+  const sorted=Object.entries(cnt).filter(([c])=>c!=='neutral').sort((a,b)=>b[1]-a[1]);
+  document.getElementById('clanList').innerHTML=sorted.map(([id,n])=>{
+    const c=CLANS[id]||CLANS.neutral, isY=id==='player';
+    return `<div class="clan-row" style="${isY?'background:rgba(42,92,138,0.15)':''}">
+      <div class="clan-color" style="background:${c.color}"></div>
+      <span class="clan-name" style="color:${c.text}">${c.k} ${c.name}</span>
+      ${isY?'<span style="color:#c8960c;font-size:0.65rem">YOU</span>':''}
+      <span class="clan-provs">${n}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── END CHECK ──
+function checkEnd(){
+  const pp=Object.values(G.provinces).filter(p=>p.owner==='player');
+  const total=Object.values(G.provinces).length;
+  if(pp.length===0){
+    document.getElementById('goTitle').textContent='⚔ DEFEAT ⚔';
+    document.getElementById('goTitle').style.color='#8b1a1a';
+    document.getElementById('goSub').textContent='The Tokugawa clan has fallen...';
+    document.getElementById('gameOver').classList.add('active');
+  } else if(pp.length>=Math.ceil(total*0.75)){
+    document.getElementById('goTitle').textContent='⛩ VICTORY ⛩';
+    document.getElementById('goTitle').style.color='#c8960c';
+    document.getElementById('goSub').textContent=`Japan united! ${pp.length}/${total} provinces under Tokugawa!`;
+    document.getElementById('gameOver').classList.add('active');
+  }
+}
+
+// ── LOG / NOTIFY ──
+function log(msg,type='battle'){
+  const el=document.getElementById('eventLog');
+  const d=document.createElement('div');
+  d.className=`log-entry ${type}`;
+  d.innerHTML=`<span class="log-turn">[${G.turn}]</span>${msg}`;
+  el.insertBefore(d,el.firstChild);
+  if(el.children.length>50)el.removeChild(el.lastChild);
+}
+let nTimer;
+function notify(msg){
+  const el=document.getElementById('notification');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(nTimer); nTimer=setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+// ── EVENTS ──
+document.getElementById('endTurnBtn').addEventListener('click',()=>{
+  if(G.phase!=='player')return;
+  log(`Turn ${G.turn}: Samurai march...`,'player');
+  doAiTurn();
+});
+
+// ── LOAD ──
+function boot(){
+  const fill=document.getElementById('loaderFill'), status=document.getElementById('loadStatus');
+  const steps=[[15,'Loading provinces...'],[35,'Assembling armies...'],[55,'Building castles...'],[75,'Briefing daimyo...'],[90,'Preparing map...'],[100,'Ready for battle!']];
+  let i=0;
+  const iv=setInterval(()=>{
+    if(i>=steps.length){clearInterval(iv);setTimeout(()=>{
+      document.getElementById('loading').style.display='none';
+      document.getElementById('game').style.display='block';
+      render(); updateRes();
+      log('The Sengoku era begins! Conquer Japan for the Tokugawa!','player');
+      notify('⚔ Click your provinces (blue) to begin your conquest');
+    },300);return;}
+    fill.style.width=steps[i][0]+'%'; status.textContent=steps[i][1]; i++;
+  },300);
+}
+boot();
+</script>
+</body>
+</html>

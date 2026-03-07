@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PixelWorld II — God Sandbox</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap');
+:root{
+  --bg:#07080f;--panel:#0e0f1a;--panel2:#141526;--border:#1e2035;
+  --accent:#ffcc00;--accent2:#ff6b35;--text:#dde0f0;--dim:#555878;
+  --green:#3cb85e;--blue:#3a8fd8;--red:#d94040;--purple:#9040c8;
+  --gold:#e8b820;--fire:#ff5500;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'VT323',monospace;font-size:16px;overflow:hidden;height:100vh;display:flex;flex-direction:column;user-select:none;}
+#header{background:var(--panel);border-bottom:2px solid var(--border);padding:4px 10px;display:flex;align-items:center;gap:12px;z-index:100;height:40px;flex-shrink:0;}
+#header h1{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--accent);text-shadow:0 0 14px rgba(255,204,0,.6);letter-spacing:1px;}
+.header-sep{flex:1;}
+#stats-bar{display:flex;gap:10px;font-size:14px;}
+.stat{color:var(--dim);white-space:nowrap;}
+.stat span{color:var(--text);font-size:15px;}
+#main{display:flex;flex:1;overflow:hidden;min-height:0;}
+/* LEFT PANEL */
+#left-panel{width:64px;background:var(--panel);border-right:2px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:6px 3px;gap:2px;z-index:50;overflow-y:auto;overflow-x:hidden;flex-shrink:0;}
+#left-panel::-webkit-scrollbar{width:2px;}
+#left-panel::-webkit-scrollbar-thumb{background:var(--border);}
+.tool-section-label{font-family:'Press Start 2P',monospace;font-size:5px;color:var(--dim);margin:4px 0 2px;letter-spacing:.3px;text-align:center;}
+.tool-btn{width:50px;height:44px;background:var(--panel2);border:2px solid var(--border);border-radius:3px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all .1s;font-size:18px;position:relative;flex-shrink:0;}
+.tool-btn:hover{border-color:var(--accent);background:#181930;transform:scale(1.04);}
+.tool-btn.active{border-color:var(--accent);background:#1e2040;box-shadow:0 0 8px rgba(255,204,0,.35);}
+.tool-btn.god-power{border-color:#333;font-size:16px;}
+.tool-btn.god-power:hover{border-color:var(--fire);}
+.tool-btn.god-power.active{border-color:var(--fire);box-shadow:0 0 8px rgba(255,85,0,.4);}
+.tool-label{font-size:5.5px;font-family:'Press Start 2P',monospace;color:var(--dim);text-align:center;line-height:1.1;}
+.tool-btn.active .tool-label{color:var(--accent);}
+.tool-btn.god-power.active .tool-label{color:var(--fire);}
+.tool-sep{width:36px;height:1px;background:var(--border);margin:3px 0;flex-shrink:0;}
+.brush-size-row{display:flex;gap:2px;flex-direction:column;align-items:center;}
+.bs-btn{width:18px;height:14px;background:var(--panel2);border:1px solid var(--border);border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--dim);}
+.bs-btn.active{border-color:var(--accent);color:var(--accent);}
+.bs-btn:hover{border-color:var(--dim);}
+/* CANVAS */
+#canvas-area{flex:1;position:relative;overflow:hidden;background:#000;cursor:crosshair;min-width:0;}
+#world-canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
+/* RIGHT PANEL */
+#right-panel{width:210px;background:var(--panel);border-left:2px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:50;flex-shrink:0;}
+.panel-tabs{display:flex;border-bottom:2px solid var(--border);}
+.tab-btn{flex:1;font-family:'Press Start 2P',monospace;font-size:6px;padding:6px 2px;cursor:pointer;background:transparent;border:none;color:var(--dim);transition:.1s;text-align:center;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--accent);background:var(--panel2);}
+.tab-content{flex:1;overflow-y:auto;display:none;}
+.tab-content.active{display:block;}
+.tab-content::-webkit-scrollbar{width:3px;}
+.tab-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+#kingdoms-list,#chronicle-list,#detail-panel{padding:5px;}
+.kingdom-card{background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:5px 7px;margin-bottom:5px;cursor:pointer;transition:border-color .15s;}
+.kingdom-card:hover{border-color:var(--dim);}
+.kingdom-card.selected{border-color:var(--accent);}
+.kingdom-header{display:flex;align-items:center;gap:5px;margin-bottom:3px;}
+.kingdom-color{width:9px;height:9px;border-radius:1px;flex-shrink:0;}
+.kingdom-name{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.kingdom-stats{font-size:12px;color:var(--dim);line-height:1.4;}
+.kingdom-stats .ks{color:var(--text);}
+.war-badge{display:inline-block;background:#2a0a0a;border:1px solid var(--red);color:var(--red);font-size:9px;padding:1px 4px;border-radius:2px;margin-top:2px;}
+.ally-badge{display:inline-block;background:#0a1a2a;border:1px solid var(--blue);color:var(--blue);font-size:9px;padding:1px 4px;border-radius:2px;margin-top:2px;}
+.progress-bar{height:3px;background:var(--border);border-radius:1px;margin-top:2px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:1px;transition:width .4s;}
+.epoch-badge{font-family:'Press Start 2P',monospace;font-size:5px;padding:2px 4px;border-radius:2px;margin-top:3px;display:inline-block;}
+.epoch-0{background:#3a2010;color:#c8803a;border:1px solid #7a4020;}
+.epoch-1{background:#1a2a10;color:#80b840;border:1px solid #405820;}
+.epoch-2{background:#10203a;color:#4080d0;border:1px solid #204070;}
+.epoch-3{background:#2a1a3a;color:#a060e0;border:1px solid #604080;}
+.chron-entry{font-size:12px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--border);line-height:1.3;}
+.chron-entry span{color:var(--text);}
+.chron-war{color:#d06060;}
+.chron-found{color:#60c060;}
+.chron-peace{color:#6090d0;}
+.chron-disaster{color:#e08030;}
+.chron-tech{color:#c060e0;}
+.res-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;padding:2px 0;}
+.res-icon{font-size:14px;}
+.rel-bar-wrap{display:flex;align-items:center;gap:4px;font-size:11px;}
+.rel-bar{height:4px;border-radius:2px;transition:width .3s;}
+/* BOTTOM BAR */
+#bottom-bar{background:var(--panel);border-top:2px solid var(--border);padding:4px 10px;display:flex;align-items:center;gap:10px;height:42px;z-index:100;flex-shrink:0;}
+.ctrl-btn{background:var(--panel2);border:2px solid var(--border);color:var(--text);font-family:'VT323',monospace;font-size:17px;padding:1px 9px;cursor:pointer;border-radius:2px;transition:all .1s;}
+.ctrl-btn:hover{border-color:var(--accent);color:var(--accent);}
+.ctrl-btn.active-btn{border-color:var(--accent);color:var(--accent);}
+#speed-display{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--accent);min-width:52px;}
+#event-log{flex:1;overflow:hidden;}
+#event-messages{font-size:13px;color:var(--dim);display:flex;gap:14px;overflow:hidden;white-space:nowrap;}
+.event-msg{flex-shrink:0;animation:scroll-left 14s linear forwards;}
+@keyframes scroll-left{from{transform:translateX(0);opacity:1}to{transform:translateX(-500px);opacity:0}}
+.event-war{color:#e06060;}.event-found{color:#60d060;}.event-peace{color:#60a0e0;}.event-tech{color:#c060f0;}.event-disaster{color:#ff8030;}
+#year-display{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--dim);min-width:90px;white-space:nowrap;}
+#year-display span{color:var(--text);}
+/* OVERLAY */
+#pause-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:10;pointer-events:none;opacity:0;transition:opacity .3s;}
+#pause-overlay.show{opacity:1;}
+#pause-text{font-family:'Press Start 2P',monospace;font-size:18px;color:var(--accent);text-shadow:0 0 20px rgba(255,204,0,.8);animation:pulse 1.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* PARTICLES */
+.particle{position:absolute;pointer-events:none;font-size:14px;animation:particleFly .8s ease-out forwards;}
+@keyframes particleFly{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-30px) scale(.3)}}
+/* TOOLTIP */
+#tooltip{position:fixed;background:var(--panel);border:2px solid var(--border);padding:5px 9px;font-size:13px;pointer-events:none;z-index:999;display:none;border-radius:3px;max-width:170px;line-height:1.5;}
+#tooltip.show{display:block;}
+/* DETAIL POPUP */
+#detail-panel h3{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--accent);margin-bottom:6px;}
+#detail-panel .dp-row{font-size:13px;padding:2px 0;display:flex;justify-content:space-between;}
+#detail-panel .dp-val{color:var(--text);}
+#detail-panel .dp-label{color:var(--dim);}
+</style>
+</head>
+<body>
+<div id="header">
+  <h1>&#9876; PIXELWORLD II</h1>
+  <div id="stats-bar">
+    <div class="stat">&#128100; <span id="s-humans">0</span></div>
+    <div class="stat">&#127968; <span id="s-villages">0</span></div>
+    <div class="stat">&#9812; <span id="s-kingdoms">0</span></div>
+    <div class="stat">&#9876; <span id="s-wars">0</span></div>
+    <div class="stat">&#128016; <span id="s-animals">0</span></div>
+    <div class="stat">&#127757; <span id="s-year-era">Steinzeit</span></div>
+  </div>
+  <div class="header-sep"></div>
+  <div id="year-display">Jahr: <span id="year-val">1</span></div>
+</div>
+<div id="main">
+  <div id="left-panel">
+    <div class="tool-section-label">WESEN</div>
+    <div class="tool-btn active" data-tool="human">&#129489;<span class="tool-label">MENSCH</span></div>
+    <div class="tool-btn" data-tool="animal">&#128016;<span class="tool-label">TIER</span></div>
+    <div class="tool-btn" data-tool="wolf">&#128058;<span class="tool-label">WOLF</span></div>
+    <div class="tool-btn" data-tool="dragon">&#128009;<span class="tool-label">DRACHE</span></div>
+    <div class="tool-sep"></div>
+    <div class="tool-section-label">TERRAIN</div>
+    <div class="tool-btn" data-tool="forest">&#127794;<span class="tool-label">WALD</span></div>
+    <div class="tool-btn" data-tool="mountain">&#9968;<span class="tool-label">BERG</span></div>
+    <div class="tool-btn" data-tool="water">&#128167;<span class="tool-label">WASSER</span></div>
+    <div class="tool-btn" data-tool="gold">&#129756;<span class="tool-label">GOLD</span></div>
+    <div class="tool-btn" data-tool="erase">&#129529;<span class="tool-label">LÖSCH</span></div>
+    <div class="tool-sep"></div>
+    <div class="tool-section-label">GÖTTER</div>
+    <div class="tool-btn god-power" data-tool="lightning">&#9889;<span class="tool-label">BLITZ</span></div>
+    <div class="tool-btn god-power" data-tool="meteor">&#9732;<span class="tool-label">METEOR</span></div>
+    <div class="tool-btn god-power" data-tool="fire">&#128293;<span class="tool-label">FEUER</span></div>
+    <div class="tool-btn god-power" data-tool="volcano">&#127755;<span class="tool-label">VULKAN</span></div>
+    <div class="tool-btn god-power" data-tool="quake">&#9883;<span class="tool-label">BEBEN</span></div>
+    <div class="tool-btn god-power" data-tool="heal">&#128153;<span class="tool-label">HEILUNG</span></div>
+    <div class="tool-btn god-power" data-tool="rain">&#127783;<span class="tool-label">REGEN</span></div>
+    <div class="tool-sep"></div>
+    <div class="tool-section-label">SIZE</div>
+    <div class="brush-size-row">
+      <div class="bs-btn active" data-size="1">1</div>
+      <div class="bs-btn" data-size="2">2</div>
+      <div class="bs-btn" data-size="3">3</div>
+      <div class="bs-btn" data-size="5">5</div>
+    </div>
+  </div>
+  <div id="canvas-area">
+    <canvas id="world-canvas"></canvas>
+    <div id="pause-overlay"><div id="pause-text">&#9208; PAUSE</div></div>
+  </div>
+  <div id="right-panel">
+    <div class="panel-tabs">
+      <div class="tab-btn active" data-tab="kingdoms">&#9812;REICHE</div>
+      <div class="tab-btn" data-tab="chronicle">&#128214;LOG</div>
+      <div class="tab-btn" data-tab="detail">&#128269;INFO</div>
+    </div>
+    <div class="tab-content active" id="tab-kingdoms">
+      <div id="kingdoms-list"><div style="color:var(--dim);font-size:13px;padding:8px;text-align:center;">Noch keine Reiche.<br>Platziere Menschen!</div></div>
+    </div>
+    <div class="tab-content" id="tab-chronicle">
+      <div id="chronicle-list"></div>
+    </div>
+    <div class="tab-content" id="tab-detail">
+      <div id="detail-panel"><div style="color:var(--dim);font-size:13px;padding:6px;">Klicke auf eine Stadt oder ein Königreich.</div></div>
+    </div>
+  </div>
+</div>
+<div id="bottom-bar">
+  <button class="ctrl-btn" id="btn-pause">&#9208;</button>
+  <button class="ctrl-btn" id="btn-slower">&#9664;&#9664;</button>
+  <div id="speed-display">1x</div>
+  <button class="ctrl-btn" id="btn-faster">&#9654;&#9654;</button>
+  <div style="width:1px;height:22px;background:var(--border)"></div>
+  <button class="ctrl-btn" id="btn-reset" title="Welt zurücksetzen">&#128260;</button>
+  <div style="flex:1"></div>
+  <div id="event-log"><div id="event-messages"></div></div>
+</div>
+<div id="tooltip"></div>
+
+<script>
+'use strict';
+// ================================================================
+// CONSTANTS
+// ================================================================
+const TILE = 8;
+const COLS = Math.floor((window.innerWidth - 274) / TILE);
+const ROWS = Math.floor((window.innerHeight - 82) / TILE);
+const MAX_UNITS = 600;
+
+const T = {
+  GRASS:0,WATER:1,MOUNTAIN:2,FOREST:3,VILLAGE:4,CASTLE:5,ROAD:6,
+  SAND:7,SNOW:8,FARM:9,MINE:10,WALL:11,RUIN:12,GOLD_ORE:13,FIRE_TILE:14
+};
+
+const BIOME = { TEMPERATE:0, DESERT:1, TUNDRA:2, JUNGLE:3 };
+
+const EPOCH = ['Steinzeit','Bronzezeit','Eisenzeit','Mittelalter'];
+const EPOCH_COLOR = ['epoch-0','epoch-1','epoch-2','epoch-3'];
+
+const TILE_BASE = {
+  [T.GRASS]:  ['#3d7040','#467545','#3a6a3c','#507a50'],
+  [T.WATER]:  ['#1a4070','#1e4d88','#173870','#1b4880'],
+  [T.MOUNTAIN]:['#6a6055','#7a7065','#5e5548','#726858'],
+  [T.FOREST]: ['#185018','#1d5a1d','#145014','#1a5520'],
+  [T.VILLAGE]:['#b89050','#c8a060','#ac8845','#c09858'],
+  [T.CASTLE]: ['#807060','#908070','#706050','#887868'],
+  [T.ROAD]:   ['#988860','#a89870','#8e7e58','#a09068'],
+  [T.SAND]:   ['#c8b870','#d8c880','#bca860','#d0bc78'],
+  [T.SNOW]:   ['#ccdcec','#d8e8f4','#c4d4e4','#d0dced'],
+  [T.FARM]:   ['#88a840','#98b848','#809838','#90a840'],
+  [T.MINE]:   ['#484038','#544840','#404038','#504840'],
+  [T.WALL]:   ['#686060','#787070','#605858','#706868'],
+  [T.RUIN]:   ['#706858','#806858','#685048','#786060'],
+  [T.GOLD_ORE]:['#8a7830','#9a8838','#807028','#907830'],
+  [T.FIRE_TILE]:['#c03010','#d04020','#e05010','#c84020'],
+};
+
+const KINGDOM_COLORS = [
+  '#e03030','#2878d0','#28a048','#d09020','#9030b0',
+  '#18a090','#d06010','#c02080','#1090c0','#70a830',
+  '#d04050','#5068a0','#708040','#b07030','#6028a0'
+];
+const KNAMES_A = ['Nord','Sud','Ost','West','Grosz','Alt','Neu','Rot','Gold','Eisen','Stein','Feuer','Eis','Silber','Dunkel','Licht'];
+const KNAMES_B = ['reich','burg','heim','land','mark','berg','wald','see','furt','gard','tal','hain','dorf','bach','stein','feld'];
+
+// ================================================================
+// WORLD STATE
+// ================================================================
+let world = {
+  tiles:[],tileVariant:[],biome:[],
+  resources:{},   // key "r,c" -> {wood,stone,food,gold}
+  territory:{},   // key "r,c" -> kingdomId
+  units:[],kingdoms:[],villages:[],
+  particles:[],fireTiles:new Set(),
+  year:1,nextId:1,
+  chronicle:[],
+  spatialGrid:{},
+  gridW:0,gridH:0,
+};
+
+let sim = {
+  paused:false,speedIdx:2,tickMs:100,lastTick:0,
+  tool:'human',brushSize:1,mouseDown:false,lastPlaced:null,
+  selectedKingdom:null,
+  camX:0,camY:0,zoom:1,
+  dragging:false,dragStartX:0,dragStartY:0,dragCamX:0,dragCamY:0,
+};
+
+const SPEED_VALS = [0.2,0.5,1,2,5];
+const SPEED_LABELS = ['1/5x','1/2x','1x','2x','5x'];
+
+// ================================================================
+// CANVAS
+// ================================================================
+const canvas = document.getElementById('world-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = COLS*TILE;
+canvas.height = ROWS*TILE;
+
+// ================================================================
+// SPATIAL GRID
+// ================================================================
+const GCELL = 8; // tiles per cell
+function gridKey(r,c){ return ((r/GCELL)|0)*1000+((c/GCELL)|0); }
+function sgClear(){ world.spatialGrid={}; }
+function sgAdd(u){ const k=gridKey(u.r,u.c); (world.spatialGrid[k]||(world.spatialGrid[k]=[])).push(u); }
+function sgQuery(r,c,radius){
+  const out=[];
+  const cr=(r/GCELL)|0, cc=(c/GCELL)|0;
+  const gr=Math.ceil(radius/GCELL)+1;
+  for(let dr=-gr;dr<=gr;dr++) for(let dc=-gr;dc<=gr;dc++){
+    const cell=world.spatialGrid[(cr+dr)*1000+(cc+dc)];
+    if(cell) for(const u of cell) if(Math.abs(u.r-r)+Math.abs(u.c-c)<=radius) out.push(u);
+  }
+  return out;
+}
+function rebuildGrid(){
+  sgClear();
+  for(const u of world.units) sgAdd(u);
+}
+
+// ================================================================
+// INIT
+// ================================================================
+function initWorld(){
+  world.tiles=[];world.tileVariant=[];world.biome=[];
+  world.resources={};world.territory={};
+  world.units=[];world.kingdoms=[];world.villages=[];
+  world.particles=[];world.fireTiles=new Set();
+  world.year=1;world.nextId=1;world.chronicle=[];
+  sim.selectedKingdom=null;
+
+  world.gridW=COLS;world.gridH=ROWS;
+
+  for(let r=0;r<ROWS;r++){
+    world.tiles[r]=[];world.tileVariant[r]=[];world.biome[r]=[];
+    for(let c=0;c<COLS;c++){
+      world.tiles[r][c]=T.GRASS;
+      world.tileVariant[r][c]=(Math.random()*4)|0;
+      world.biome[r][c]=BIOME.TEMPERATE;
+    }
+  }
+  generateTerrain();
+  renderAll();
+  updateUI();
+  updateKingdomPanel();
+}
+
+// ================================================================
+// TERRAIN GENERATION (improved)
+// ================================================================
+function generateTerrain(){
+  // Biome zones
+  const desertRow=Math.floor(ROWS*0.6);
+  const snowRow=Math.floor(ROWS*0.1);
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const nr=r/ROWS;
+      if(nr<0.12||nr>0.88) world.biome[r][c]=BIOME.TUNDRA;
+      else if(nr>0.55&&nr<0.78) world.biome[r][c]=BIOME.DESERT;
+    }
+  }
+
+  // Continents via perlin-like noise
+  const freq=0.05;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const n=noise2d(c*freq,r*freq);
+    if(n<-0.25) world.tiles[r][c]=T.WATER;
+  }
+
+  // Biome tiles
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    if(world.tiles[r][c]===T.WATER) continue;
+    const b=world.biome[r][c];
+    if(b===BIOME.DESERT) world.tiles[r][c]=T.SAND;
+    if(b===BIOME.TUNDRA) world.tiles[r][c]=T.SNOW;
+  }
+
+  // Mountain chains
+  for(let i=0;i<5;i++){
+    let r=randi(5,ROWS-5),c=randi(5,COLS-5);
+    const len=randi(8,25);
+    for(let j=0;j<len;j++){
+      paintBlob(r,c,randi(1,3),T.MOUNTAIN,0.75);
+      r+=randi(-2,2);c+=randi(-2,3);
+      r=clamp(r,2,ROWS-2);c=clamp(c,2,COLS-2);
+    }
+  }
+
+  // Forests
+  for(let i=0;i<25;i++){
+    const r=randi(2,ROWS-2),c=randi(2,COLS-2);
+    if(world.tiles[r][c]!==T.WATER&&world.tiles[r][c]!==T.MOUNTAIN&&world.biome[r][c]===BIOME.TEMPERATE)
+      paintBlob(r,c,randi(2,7),T.FOREST,0.68);
+  }
+
+  // Gold deposits
+  for(let i=0;i<12;i++){
+    const r=randi(2,ROWS-2),c=randi(2,COLS-2);
+    if(world.tiles[r][c]===T.MOUNTAIN||world.tiles[r][c]===T.GRASS||world.tiles[r][c]===T.SAND){
+      world.tiles[r][c]=T.GOLD_ORE;
+      world.tileVariant[r][c]=(Math.random()*4)|0;
+    }
+  }
+
+  // Rivers
+  for(let i=0;i<4;i++) generateRiver();
+}
+
+function generateRiver(){
+  let r=randi(0,5),c=randi(10,COLS-10);
+  const steps=randi(20,60);
+  for(let i=0;i<steps;i++){
+    if(!inBounds(r,c)) break;
+    if(world.tiles[r][c]!==T.MOUNTAIN){
+      world.tiles[r][c]=T.WATER;
+      world.tileVariant[r][c]=(Math.random()*4)|0;
+    }
+    r+=randi(0,2);
+    c+=randi(-1,1);
+    r=clamp(r,0,ROWS-1);c=clamp(c,0,COLS-1);
+  }
+}
+
+// Simple value noise
+function noise2d(x,y){
+  const xi=Math.floor(x),yi=Math.floor(y);
+  const xf=x-xi,yf=y-yi;
+  const h=n=>((Math.sin(n*127.1+n*311.7)*43758.5453)%1+1)%1*2-1;
+  const a=h(xi+yi*997),b=h(xi+1+yi*997),c2=h(xi+(yi+1)*997),d=h(xi+1+(yi+1)*997);
+  return lerp(lerp(a,b,xf),lerp(c2,d,xf),yf);
+}
+function lerp(a,b,t){return a+(b-a)*t;}
+
+function paintBlob(r,c,radius,type,density){
+  for(let dr=-radius;dr<=radius;dr++) for(let dc=-radius;dc<=radius;dc++){
+    if(dr*dr+dc*dc<=radius*radius&&Math.random()<density){
+      const nr=r+dr,nc=c+dc;
+      if(inBounds(nr,nc)&&world.tiles[nr][nc]!==T.WATER){
+        world.tiles[nr][nc]=type;
+        world.tileVariant[nr][nc]=(Math.random()*4)|0;
+      }
+    }
+  }
+}
+
+// ================================================================
+// UNIT & KINGDOM CLASSES
+// ================================================================
+class Unit{
+  constructor(type,r,c){
+    this.id=world.nextId++;
+    this.type=type; // human,animal,wolf,dragon
+    this.r=r;this.c=c;
+    this.age=0;this.hp=100;this.maxHp=100;
+    this.kingdomId=null;this.villageId=null;
+    this.state='wander'; // wander,war,flee,hunt,guard
+    this.target=null;
+    this.energy=80+randi(0,40);
+    this.hunger=0;
+    this.tickTimer=randi(0,30);
+    this.warrior=Math.random()<0.3;
+    this.isKing=false;
+    this.attack=5+randi(0,5);
+    this.defense=2;
+    this.job='idle'; // idle,farmer,miner,soldier,builder
+  }
+}
+
+class Kingdom{
+  constructor(id,color,name){
+    this.id=id;this.color=color;this.name=name;
+    this.population=0;this.villages=[];this.warriors=0;
+    this.atWarWith=new Set();this.allies=new Set();
+    this.relations={};  // kingdomId -> -100..100
+    this.age=0;this.wealth=50;
+    this.resources={wood:20,stone:10,food:30,gold:0};
+    this.epoch=0;       // 0-3
+    this.techPoints=0;
+    this.kingId=null;   // unit id of king
+    this.alive=true;
+    this.warCooldown=0;
+    this.lastWarYear=0;
+  }
+}
+
+class Village{
+  constructor(r,c,kingdomId){
+    this.id=world.nextId++;
+    this.r=r;this.c=c;this.kingdomId=kingdomId;
+    this.population=1;
+    this.level=1; // 1=hamlet,2=village,3=town,4=city,5=capital
+    this.buildProgress=0;
+    this.age=0;this.hp=100;this.maxHp=100;
+    this.resources={wood:10,stone:5,food:20,gold:0};
+    this.buildings=[]; // 'farm','mine','barracks','wall','market'
+    this.territory=new Set();
+    this.isCapital=false;
+  }
+}
+
+// ================================================================
+// RESOURCE SYSTEM
+// ================================================================
+function getRes(r,c){
+  const k=r+','+c;
+  if(!world.resources[k]) world.resources[k]={wood:0,stone:0,food:0,gold:0};
+  return world.resources[k];
+}
+function initTileResources(r,c){
+  const t=world.tiles[r][c];
+  const res=getRes(r,c);
+  if(t===T.FOREST){res.wood=randi(8,20);}
+  if(t===T.MOUNTAIN){res.stone=randi(10,25);}
+  if(t===T.GOLD_ORE){res.gold=randi(5,15);}
+  if(t===T.GRASS||t===T.FARM){res.food=randi(5,15);}
+}
+function harvestNearby(v){
+  const k=getKingdom(v.kingdomId);
+  if(!k) return;
+  const radius=4+v.level;
+  // Scan nearby tiles for resources
+  for(let dr=-radius;dr<=radius;dr+=2) for(let dc=-radius;dc<=radius;dc+=2){
+    const nr=v.r+dr,nc=v.c+dc;
+    if(!inBounds(nr,nc)) continue;
+    const res=getRes(nr,nc);
+    const t=world.tiles[nr][nc];
+    if(res.wood>0&&t===T.FOREST){const amt=Math.min(res.wood,1);res.wood-=amt;v.resources.wood+=amt;k.resources.wood+=amt;}
+    if(res.stone>0&&(t===T.MOUNTAIN||t===T.MINE)){const amt=Math.min(res.stone,1);res.stone-=amt;v.resources.stone+=amt;k.resources.stone+=amt;}
+    if(res.gold>0&&t===T.GOLD_ORE){const amt=Math.min(res.gold,.5);res.gold-=amt;v.resources.gold+=amt;k.resources.gold+=amt;}
+    if(res.food>0){const amt=Math.min(res.food,1);res.food-=amt;v.resources.food+=amt;k.resources.food+=amt;}
+  }
+}
+
+// ================================================================
+// TECHNOLOGY SYSTEM
+// ================================================================
+const EPOCH_THRESHOLDS=[0,200,600,1400];
+const EPOCH_BONUSES=[
+  {attack:5,defense:2,maxPop:30,buildTime:100},
+  {attack:10,defense:4,maxPop:80,buildTime:70},
+  {attack:18,defense:8,maxPop:150,buildTime:50},
+  {attack:30,defense:15,maxPop:300,buildTime:30},
+];
+
+function tickTechnology(k){
+  if(k.epoch>=3) return;
+  // Gain tech points from villages, wealth, resources
+  const pts=(k.villages.length*0.3)+(k.resources.gold*0.05)+(k.resources.wood>50?0.1:0)+(k.resources.stone>50?0.1:0);
+  k.techPoints+=pts;
+  if(k.techPoints>=EPOCH_THRESHOLDS[k.epoch+1]){
+    k.epoch++;
+    k.techPoints=0;
+    const epochName=EPOCH[k.epoch];
+    addEvent(`${k.name}: ${epochName}!`,'tech');
+    addChronicle(`${k.name} erreicht die ${epochName}`,'tech',k.color);
+    // Upgrade warriors
+    world.units.filter(u=>u.kingdomId===k.id&&u.warrior).forEach(u=>{
+      const b=EPOCH_BONUSES[k.epoch];
+      u.attack=b.attack+randi(0,5);
+      u.defense=b.defense;
+      u.maxHp=100+k.epoch*30;
+      u.hp=Math.min(u.hp,u.maxHp);
+    });
+  }
+}
+
+// ================================================================
+// TERRITORY SYSTEM
+// ================================================================
+function updateTerritory(v){
+  const k=getKingdom(v.kingdomId);
+  if(!k) return;
+  const radius=2+v.level*2;
+  for(let dr=-radius;dr<=radius;dr++) for(let dc=-radius;dc<=radius;dc++){
+    if(dr*dr+dc*dc>radius*radius) continue;
+    const nr=v.r+dr,nc=v.c+dc;
+    if(!inBounds(nr,nc)) continue;
+    const key=nr+','+nc;
+    const prevKid=world.territory[key];
+    if(prevKid!==v.kingdomId){
+      world.territory[key]=v.kingdomId;
+      v.territory.add(key);
+    }
+  }
+}
+
+// ================================================================
+// DIPLOMACY SYSTEM
+// ================================================================
+function getRelation(k1,k2){
+  if(!k1.relations[k2.id]) k1.relations[k2.id]=0;
+  return k1.relations[k2.id];
+}
+function changeRelation(k1,k2,delta){
+  k1.relations[k2.id]=(k1.relations[k2.id]||0)+delta;
+  k1.relations[k2.id]=clamp(k1.relations[k2.id],-100,100);
+  k2.relations[k1.id]=(k2.relations[k1.id]||0)+delta;
+  k2.relations[k1.id]=clamp(k2.relations[k1.id],-100,100);
+}
+function tickDiplomacy(k){
+  const others=world.kingdoms.filter(o=>o.alive&&o.id!==k.id);
+  for(const o of others){
+    const rel=getRelation(k,o);
+    // Natural drift toward 0
+    if(rel>0) changeRelation(k,o,-0.05);
+    if(rel<0) changeRelation(k,o,0.02);
+    // Propose alliance if very friendly
+    if(rel>70&&!k.allies.has(o.id)&&!k.atWarWith.has(o.id)&&Math.random()<0.001){
+      k.allies.add(o.id); o.allies.add(k.id);
+      addEvent(`${k.name} + ${o.name}: Allianz!`,'peace');
+      addChronicle(`Allianz: ${k.name} & ${o.name}`,'peace',k.color);
+    }
+    // War if very hostile
+    if(rel<-70&&!k.atWarWith.has(o.id)&&k.atWarWith.size<2&&k.warCooldown===0&&k.population>5){
+      declareWar(k,o);
+    }
+    // Trade when allied
+    if(k.allies.has(o.id)&&Math.random()<0.002){
+      const tradeAmt=Math.min(5,k.resources.food,o.resources.food);
+      k.resources.gold+=tradeAmt*0.1;
+      o.resources.gold+=tradeAmt*0.1;
+    }
+  }
+  if(k.warCooldown>0) k.warCooldown--;
+}
+
+// ================================================================
+// PLACEMENT
+// ================================================================
+function placeTool(r,c){
+  const bs=sim.brushSize;
+  const offsets=[];
+  for(let dr=-(bs-1);dr<=(bs-1);dr++) for(let dc=-(bs-1);dc<=(bs-1);dc++) offsets.push([dr,dc]);
+  for(const [dr,dc] of offsets){
+    const nr=r+dr,nc=c+dc;
+    if(inBounds(nr,nc)) placeAt(nr,nc);
+  }
+}
+
+function placeAt(r,c){
+  const t=sim.tool;
+  const tile=world.tiles[r][c];
+
+  switch(t){
+    case 'human':
+      if(tile===T.WATER||tile===T.MOUNTAIN) return;
+      if(world.units.length>=MAX_UNITS) return;
+      if(world.units.some(u=>u.r===r&&u.c===c&&u.type==='human')) return;
+      world.units.push(new Unit('human',r,c));
+      break;
+    case 'animal':
+      if(tile===T.WATER||tile===T.MOUNTAIN) return;
+      world.units.push(new Unit('animal',r,c));
+      break;
+    case 'wolf':
+      if(tile===T.WATER) return;
+      {const u=new Unit('wolf',r,c);u.hp=60;u.maxHp=60;u.attack=12;world.units.push(u);}
+      break;
+    case 'dragon':
+      {const u=new Unit('dragon',r,c);u.hp=300;u.maxHp=300;u.attack=35;world.units.push(u);}
+      break;
+    case 'forest':
+      if(tile===T.WATER||tile===T.MOUNTAIN||tile===T.VILLAGE||tile===T.CASTLE) return;
+      world.tiles[r][c]=T.FOREST;world.tileVariant[r][c]=(Math.random()*4)|0;
+      initTileResources(r,c);break;
+    case 'mountain':
+      if(tile===T.WATER||tile===T.VILLAGE||tile===T.CASTLE) return;
+      world.tiles[r][c]=T.MOUNTAIN;world.tileVariant[r][c]=(Math.random()*4)|0;
+      removeUnitsAt(r,c);initTileResources(r,c);break;
+    case 'water':
+      if(tile===T.VILLAGE||tile===T.CASTLE) return;
+      world.tiles[r][c]=T.WATER;world.tileVariant[r][c]=(Math.random()*4)|0;
+      removeUnitsAt(r,c);break;
+    case 'gold':
+      if(tile===T.WATER) return;
+      world.tiles[r][c]=T.GOLD_ORE;world.tileVariant[r][c]=(Math.random()*4)|0;
+      initTileResources(r,c);break;
+    case 'erase':
+      world.tiles[r][c]=T.GRASS;world.tileVariant[r][c]=(Math.random()*4)|0;
+      removeUnitsAt(r,c);removeVillageAt(r,c);
+      world.fireTiles.delete(r*10000+c);
+      delete world.territory[r+','+c];
+      break;
+    // GOD POWERS
+    case 'lightning': godLightning(r,c); break;
+    case 'meteor':    godMeteor(r,c);    break;
+    case 'fire':      godFire(r,c);      break;
+    case 'volcano':   godVolcano(r,c);   break;
+    case 'quake':     godQuake(r,c);     break;
+    case 'heal':      godHeal(r,c);      break;
+    case 'rain':      godRain(r,c);      break;
+  }
+}
+
+// ================================================================
+// GOD POWERS
+// ================================================================
+function godLightning(r,c){
+  spawnParticle(r,c,'⚡');
+  // Kill units
+  for(const u of sgQuery(r,c,3)) u.hp-=randi(40,80);
+  // Destroy structure
+  if(world.tiles[r][c]===T.VILLAGE||world.tiles[r][c]===T.CASTLE){
+    const v=world.villages.find(v=>v.r===r&&v.c===c);
+    if(v){v.hp-=60;if(v.hp<=0)destroyVillage(v);}
+  }
+  addEvent('⚡ Blitz schlägt ein!','disaster');
+}
+function godMeteor(r,c){
+  spawnParticle(r,c,'☄');
+  // Destroy area
+  for(let dr=-3;dr<=3;dr++) for(let dc=-3;dc<=3;dc++){
+    if(dr*dr+dc*dc>9) continue;
+    const nr=r+dr,nc=c+dc;
+    if(!inBounds(nr,nc)) continue;
+    const v=world.villages.find(v=>v.r===nr&&v.c===nc);
+    if(v) destroyVillage(v);
+    if(world.tiles[nr][nc]!==T.WATER){
+      world.tiles[nr][nc]=T.RUIN;
+      world.tileVariant[nr][nc]=(Math.random()*4)|0;
+    }
+    for(const u of sgQuery(nr,nc,1)) u.hp-=randi(50,120);
+    if(Math.random()<0.3) world.fireTiles.add(nr*10000+nc);
+  }
+  addEvent('☄ Meteor einschlag!','disaster');
+  addChronicle('Ein Meteor trifft die Welt','disaster','#ff6030');
+}
+function godFire(r,c){
+  world.fireTiles.add(r*10000+c);
+  if(world.tiles[r][c]===T.FOREST) world.tiles[r][c]=T.FIRE_TILE;
+  spawnParticle(r,c,'🔥');
+}
+function godVolcano(r,c){
+  spawnParticle(r,c,'🌋');
+  // Create mountain + fire + lava
+  for(let dr=-4;dr<=4;dr++) for(let dc=-4;dc<=4;dc++){
+    if(dr*dr+dc*dc>16) continue;
+    const nr=r+dr,nc=c+dc;
+    if(!inBounds(nr,nc)) continue;
+    const dist=Math.sqrt(dr*dr+dc*dc);
+    if(dist<2) world.tiles[nr][nc]=T.MOUNTAIN;
+    else if(Math.random()<0.5) world.tiles[nr][nc]=T.FIRE_TILE;
+    for(const u of sgQuery(nr,nc,1)) u.hp-=randi(20,60);
+  }
+  addEvent('🌋 Vulkan bricht aus!','disaster');
+  addChronicle('Vulkanausbruch verwüstet die Gegend','disaster','#e04010');
+}
+function godQuake(r,c){
+  spawnParticle(r,c,'💥');
+  for(let dr=-5;dr<=5;dr++) for(let dc=-5;dc<=5;dc++){
+    const nr=r+dr,nc=c+dc;
+    if(!inBounds(nr,nc)) continue;
+    if(world.tiles[nr][nc]===T.VILLAGE||world.tiles[nr][nc]===T.CASTLE){
+      const v=world.villages.find(v=>v.r===nr&&v.c===nc);
+      if(v){v.hp-=30;if(v.hp<=0)destroyVillage(v);}
+    }
+    if(Math.random()<0.15&&world.tiles[nr][nc]===T.GRASS) world.tiles[nr][nc]=T.MOUNTAIN;
+  }
+  addEvent('💥 Erdbeben!','disaster');
+}
+function godHeal(r,c){
+  spawnParticle(r,c,'💚');
+  const units=sgQuery(r,c,5);
+  for(const u of units){u.hp=Math.min(u.maxHp,u.hp+50);u.hunger=Math.max(0,u.hunger-20);}
+  // Extinguish fire
+  for(let dr=-3;dr<=3;dr++) for(let dc=-3;dc<=3;dc++){
+    const nr=r+dr,nc=c+dc;
+    if(!inBounds(nr,nc)) continue;
+    world.fireTiles.delete(nr*10000+nc);
+    if(world.tiles[nr][nc]===T.FIRE_TILE) world.tiles[nr][nc]=T.RUIN;
+  }
+}
+function godRain(r,c){
+  spawnParticle(r,c,'🌧');
+  for(let dr=-6;dr<=6;dr++) for(let dc=-6;dc<=6;dc++){
+    const nr=r+dr,nc=c+dc;
+    if(!inBounds(nr,nc)) continue;
+    world.fireTiles.delete(nr*10000+nc);
+    if(world.tiles[nr][nc]===T.FIRE_TILE) world.tiles[nr][nc]=T.GRASS;
+    if(world.tiles[nr][nc]===T.SAND&&Math.random()<0.3) world.tiles[nr][nc]=T.GRASS;
+    getRes(nr,nc).food+=2;
+  }
+  addEvent('🌧 Heilsamer Regen','peace');
+}
+
+function spawnParticle(r,c,icon){
+  world.particles.push({r,c,icon,life:60,maxLife:60});
+}
+
+// ================================================================
+// VILLAGE OPERATIONS
+// ================================================================
+function removeVillageAt(r,c){
+  const vi=world.villages.findIndex(v=>v.r===r&&v.c===c);
+  if(vi<0) return;
+  const v=world.villages[vi];
+  const k=getKingdom(v.kingdomId);
+  if(k){k.villages=k.villages.filter(id=>id!==v.id);}
+  world.villages.splice(vi,1);
+}
+
+function destroyVillage(v){
+  addEvent(`${getKingdom(v.kingdomId)?.name||'?'}: Siedlung zerstört!`,'war');
+  addChronicle(`Siedlung in ${getKingdom(v.kingdomId)?.name||'?'} zerstört`,'war',getKingdom(v.kingdomId)?.color||'#888');
+  world.tiles[v.r][v.c]=T.RUIN;
+  const k=getKingdom(v.kingdomId);
+  if(k) k.villages=k.villages.filter(id=>id!==v.id);
+  world.villages=world.villages.filter(x=>x.id!==v.id);
+  // Scatter inhabitants
+  world.units.filter(u=>u.villageId===v.id).forEach(u=>{u.villageId=null;u.state='wander';});
+}
+
+function foundVillage(leader,helpers){
+  if(world.villages.some(v=>Math.abs(v.r-leader.r)+Math.abs(v.c-leader.c)<5)) return;
+  const kColor=KINGDOM_COLORS[world.kingdoms.length%KINGDOM_COLORS.length];
+  const kName=KNAMES_A[randi(0,KNAMES_A.length-1)]+KNAMES_B[randi(0,KNAMES_B.length-1)];
+  const kid=world.nextId++;
+  const k=new Kingdom(kid,kColor,kName);
+  world.kingdoms.push(k);
+
+  const v=new Village(leader.r,leader.c,kid);
+  v.isCapital=true;
+  world.villages.push(v);
+  k.villages.push(v.id);
+  world.tiles[leader.r][leader.c]=T.VILLAGE;
+
+  // Assign king
+  leader.isKing=true;leader.kingdomId=kid;leader.villageId=v.id;
+  k.kingId=leader.id;
+  for(const h of helpers){h.kingdomId=kid;h.villageId=v.id;}
+
+  initTileResources(leader.r,leader.c);
+  updateTerritory(v);
+  addEvent(`${kName} gegründet!`,'found');
+  addChronicle(`Königreich ${kName} wurde gegründet`,'found',kColor);
+}
+
+function captureVillage(v,newKid){
+  const oldK=getKingdom(v.kingdomId);
+  const newK=getKingdom(newKid);
+  if(!newK) return;
+  if(oldK){
+    oldK.villages=oldK.villages.filter(id=>id!==v.id);
+    changeRelation(oldK,newK,-30);
+    world.units.filter(u=>u.kingdomId===oldK.id&&u.villageId===v.id).forEach(u=>{
+      u.kingdomId=newKid;u.state='wander';
+    });
+  }
+  v.kingdomId=newKid;
+  newK.villages.push(v.id);
+  updateTerritory(v);
+  addEvent(`${newK.name} erobert!`,'war');
+  addChronicle(`${newK.name} erobert Siedlung von ${oldK?.name||'?'}`,'war',newK.color);
+}
+
+function declareWar(k1,k2){
+  if(k1.atWarWith.has(k2.id)) return;
+  k1.atWarWith.add(k2.id);k2.atWarWith.add(k1.id);
+  k1.allies.delete(k2.id);k2.allies.delete(k1.id);
+  changeRelation(k1,k2,-25);
+  world.units.filter(u=>u.kingdomId===k1.id&&u.warrior).forEach(u=>u.state='war');
+  world.units.filter(u=>u.kingdomId===k2.id&&u.warrior).forEach(u=>u.state='war');
+  addEvent(`⚔ Krieg: ${k1.name} vs ${k2.name}`,'war');
+  addChronicle(`Krieg zwischen ${k1.name} und ${k2.name}`,'war',k1.color);
+}
+
+function makePeace(k1,k2){
+  k1.atWarWith.delete(k2.id);k2.atWarWith.delete(k1.id);
+  k1.warCooldown=200;k2.warCooldown=200;
+  changeRelation(k1,k2,10);
+  world.units.filter(u=>u.kingdomId===k1.id&&u.state==='war').forEach(u=>u.state='wander');
+  world.units.filter(u=>u.kingdomId===k2.id&&u.state==='war').forEach(u=>u.state='wander');
+  addEvent(`☮ Frieden: ${k1.name} & ${k2.name}`,'peace');
+  addChronicle(`Frieden zwischen ${k1.name} und ${k2.name}`,'peace',k1.color);
+}
+
+// ================================================================
+// SIMULATION TICK
+// ================================================================
+function tick(){
+  world.year++;
+
+  // Rebuild spatial grid once per tick
+  rebuildGrid();
+
+  // Fire spreading
+  tickFire();
+
+  // Units - process in batches for performance
+  const unitsCopy=world.units.slice();
+  const limit=Math.min(unitsCopy.length,MAX_UNITS);
+  for(let i=0;i<limit;i++){
+    const u=unitsCopy[i];
+    if(u.hp<=0) continue;
+    switch(u.type){
+      case 'human': tickHuman(u); break;
+      case 'animal': tickAnimal(u); break;
+      case 'wolf':  tickWolf(u);  break;
+      case 'dragon':tickDragon(u);break;
+    }
+  }
+
+  // Villages
+  for(const v of world.villages) tickVillage(v);
+
+  // Kingdoms
+  for(const k of world.kingdoms){if(k.alive) tickKingdom(k);}
+
+  // Particles
+  world.particles=world.particles.filter(p=>{p.life--;return p.life>0;});
+
+  // Cleanup
+  world.units=world.units.filter(u=>u.hp>0);
+  // Cap population
+  if(world.units.length>MAX_UNITS){
+    world.units=world.units.slice(world.units.length-MAX_UNITS);
+  }
+
+  // Dead kingdoms
+  for(const k of world.kingdoms){
+    if(k.alive&&k.villages.length===0&&world.units.filter(u=>u.kingdomId===k.id).length===0){
+      k.alive=false;
+      addEvent(`${k.name} ist gefallen!`,'war');
+      addChronicle(`Königreich ${k.name} ist gefallen`,'war',k.color);
+    }
+  }
+
+  // Sync kingdom stats
+  for(const k of world.kingdoms){
+    if(!k.alive) continue;
+    k.population=world.units.filter(u=>u.kingdomId===k.id&&u.type==='human').length;
+    k.warriors=world.units.filter(u=>u.kingdomId===k.id&&u.warrior&&u.type==='human').length;
+    k.age++;
+    tickTechnology(k);
+    tickDiplomacy(k);
+  }
+
+  // King death check
+  for(const k of world.kingdoms){
+    if(!k.alive) continue;
+    if(k.kingId&&!world.units.find(u=>u.id===k.kingId)){
+      // Appoint new king
+      const newKing=world.units.find(u=>u.kingdomId===k.id&&u.type==='human');
+      if(newKing){
+        newKing.isKing=true;k.kingId=newKing.id;
+        addEvent(`${k.name}: Neuer König!`,'found');
+        addChronicle(`Neuer König in ${k.name} gekrönt`,'found',k.color);
+      } else {k.kingId=null;}
+    }
+  }
+
+  // UI update every tick
+  if(world.year%3===0){
+    updateUI();
+    updateKingdomPanel();
+  }
+}
+
+// ================================================================
+// FIRE SYSTEM
+// ================================================================
+function tickFire(){
+  const toAdd=[];const toRemove=[];
+  for(const key of world.fireTiles){
+    const r=(key/10000)|0, c=key%10000;
+    if(!inBounds(r,c)){toRemove.push(key);continue;}
+    // Damage units on fire tile
+    for(const u of sgQuery(r,c,1)) u.hp-=randi(1,4);
+    // Spread
+    if(Math.random()<0.08){
+      const dirs=[[-1,0],[1,0],[0,-1],[0,1]];
+      const d=dirs[randi(0,3)];
+      const nr=r+d[0],nc=c+d[1];
+      if(inBounds(nr,nc)){
+        const tt=world.tiles[nr][nc];
+        if(tt===T.FOREST||tt===T.GRASS||tt===T.FARM){
+          toAdd.push(nr*10000+nc);
+          world.tiles[nr][nc]=T.FIRE_TILE;
+        }
+      }
+    }
+    // Burn out
+    if(Math.random()<0.03){
+      toRemove.push(key);
+      if(world.tiles[r][c]===T.FIRE_TILE) world.tiles[r][c]=T.RUIN;
+    }
+  }
+  for(const k of toAdd) world.fireTiles.add(k);
+  for(const k of toRemove) world.fireTiles.delete(k);
+}
+
+// ================================================================
+// HUMAN AI
+// ================================================================
+function tickHuman(u){
+  u.age++;u.tickTimer++;
+  if(u.tickTimer%3!==0) return;
+
+  // Aging
+  if(u.age>900+randi(-150,150)){u.hp=0;return;}
+
+  // Hunger
+  u.hunger+=0.3;
+  if(u.hunger>100) u.hp-=0.5;
+  if(u.hunger>80) u.energy=Math.max(10,u.energy-0.5);
+
+  // Feed from village
+  const v=u.villageId?world.villages.find(x=>x.id===u.villageId):null;
+  if(v&&v.resources.food>0&&u.hunger>30){
+    const eat=Math.min(2,v.resources.food);
+    v.resources.food-=eat;u.hunger=Math.max(0,u.hunger-eat*15);
+    u.energy=Math.min(100,u.energy+eat*5);
+  }
+
+  // Reproduce
+  if(u.energy>70&&u.hunger<60&&Math.random()<0.003&&world.units.filter(x=>x.type==='human').length<MAX_UNITS*0.8){
+    const nb=getEmptyNeighbors(u.r,u.c);
+    if(nb.length>0){
+      const pos=nb[randi(0,nb.length-1)];
+      const child=new Unit('human',pos.r,pos.c);
+      child.kingdomId=u.kingdomId;child.villageId=u.villageId;
+      world.units.push(child);
+    }
+  }
+
+  // STATE MACHINE
+  if(u.state==='wander'){
+    if(Math.random()<0.45) move(u,randomDir());
+
+    // Join village
+    const nearV=findNearbyVillage(u.r,u.c,5,u.kingdomId);
+    if(nearV&&!u.villageId){u.villageId=nearV.id;if(!u.kingdomId)u.kingdomId=nearV.kingdomId;}
+
+    // Try to found kingdom
+    if(!u.kingdomId){
+      const near=sgQuery(u.r,u.c,4).filter(h=>h!==u&&h.type==='human'&&!h.kingdomId);
+      if(near.length>=2&&world.tiles[u.r][u.c]!==T.WATER&&world.tiles[u.r][u.c]!==T.MOUNTAIN){
+        foundVillage(u,near);return;
+      }
+    }
+
+    // Warriors to war
+    if(u.warrior&&u.kingdomId){
+      const k=getKingdom(u.kingdomId);
+      if(k&&k.atWarWith.size>0){u.state='war';return;}
+    }
+  }
+  else if(u.state==='war'){
+    const k=getKingdom(u.kingdomId);
+    if(!k||k.atWarWith.size===0){u.state='wander';return;}
+    const enemyKid=[...k.atWarWith][0];
+    let tgt=u.target?world.units.find(x=>x.id===u.target):null;
+    if(!tgt||tgt.hp<=0||tgt.kingdomId!==enemyKid){
+      tgt=findNearestEnemy(u.r,u.c,enemyKid,40);
+      u.target=tgt?tgt.id:null;
+    }
+    if(tgt){
+      const dist=Math.abs(tgt.r-u.r)+Math.abs(tgt.c-u.c);
+      if(dist<=1){
+        const epochBonus=EPOCH_BONUSES[k.epoch];
+        tgt.hp-=u.attack+randi(0,epochBonus.attack);
+        u.hp-=Math.max(1,randi(1,8)-u.defense);
+        spawnParticle(tgt.r,tgt.c,'💥');
+        if(tgt.hp<=0){
+          const dv=world.villages.find(v=>v.r===tgt.r&&v.c===tgt.c);
+          if(dv&&dv.kingdomId===enemyKid) captureVillage(dv,u.kingdomId);
+        }
+      } else {
+        const dr=Math.sign(tgt.r-u.r),dc=Math.sign(tgt.c-u.c);
+        if(Math.random()<0.65) move(u,{dr,dc});
+        else move(u,randomDir());
+      }
+    } else {
+      // Look for enemy village
+      const ev=world.villages.find(v=>v.kingdomId===enemyKid);
+      if(ev){const dr=Math.sign(ev.r-u.r),dc=Math.sign(ev.c-u.c);move(u,{dr,dc});}
+      else u.state='wander';
+    }
+  }
+  else if(u.state==='flee'){
+    // Move away from threats
+    const threats=sgQuery(u.r,u.c,4).filter(x=>x.type==='wolf'||x.type==='dragon');
+    if(threats.length===0){u.state='wander';return;}
+    const t=threats[0];
+    const dr=Math.sign(u.r-t.r),dc=Math.sign(u.c-t.c);
+    move(u,{dr:dr||randi(-1,1),dc:dc||randi(-1,1)});
+  }
+}
+
+// ================================================================
+// ANIMAL AI
+// ================================================================
+function tickAnimal(u){
+  u.age++;if(u.age>500){u.hp=0;return;}
+  if(u.tickTimer++%5!==0) return;
+  // Flee from wolves
+  const wlf=sgQuery(u.r,u.c,5).find(x=>x.type==='wolf');
+  if(wlf){const dr=Math.sign(u.r-wlf.r),dc=Math.sign(u.c-wlf.c);move(u,{dr:dr||randi(-1,1),dc:dc||randi(-1,1)});return;}
+  if(Math.random()<0.35) move(u,randomDir());
+  if(Math.random()<0.002){
+    const nb=getEmptyNeighbors(u.r,u.c);
+    if(nb.length>0&&world.units.filter(x=>x.type==='animal').length<80){
+      const pos=nb[randi(0,nb.length-1)];
+      world.units.push(new Unit('animal',pos.r,pos.c));
+    }
+  }
+}
+
+// ================================================================
+// WOLF AI
+// ================================================================
+function tickWolf(u){
+  u.age++;if(u.age>600){u.hp=0;return;}
+  if(u.tickTimer++%3!==0) return;
+  u.hunger=(u.hunger||0)+0.4;
+  if(u.hunger>100) u.hp-=0.5;
+  // Hunt prey
+  const prey=sgQuery(u.r,u.c,6).find(x=>x.type==='animal'||x.type==='human');
+  if(prey){
+    const dist=Math.abs(prey.r-u.r)+Math.abs(prey.c-u.c);
+    if(dist<=1){
+      prey.hp-=u.attack;u.hunger=Math.max(0,u.hunger-30);
+      spawnParticle(prey.r,prey.c,'💢');
+      if(prey.type==='human'&&prey.kingdomId){
+        const k=getKingdom(prey.kingdomId);
+        // Humans flee from wolves
+        sgQuery(prey.r,prey.c,4).filter(h=>h.type==='human'&&h.kingdomId===prey.kingdomId).forEach(h=>h.state='flee');
+      }
+    } else {
+      const dr=Math.sign(prey.r-u.r),dc=Math.sign(prey.c-u.c);
+      move(u,{dr,dc});
+    }
+  } else {
+    if(Math.random()<0.5) move(u,randomDir());
+    // Reproduce
+    if(Math.random()<0.001&&world.units.filter(x=>x.type==='wolf').length<30){
+      const nb=getEmptyNeighbors(u.r,u.c);
+      if(nb.length>0){const pos=nb[randi(0,nb.length-1)];const w=new Unit('wolf',pos.r,pos.c);w.hp=60;w.maxHp=60;w.attack=12;world.units.push(w);}
+    }
+  }
+}
+
+// ================================================================
+// DRAGON AI
+// ================================================================
+function tickDragon(u){
+  u.age++;
+  if(u.tickTimer++%2!==0) return;
+  // Fly over water
+  // Find village to attack
+  if(!u.target||!world.villages.find(v=>v.id===u.target)){
+    const v=world.villages[randi(0,world.villages.length-1)];
+    u.target=v?v.id:null;
+  }
+  const tv=u.target?world.villages.find(v=>v.id===u.target):null;
+  if(tv){
+    const dist=Math.abs(tv.r-u.r)+Math.abs(tv.c-u.c);
+    if(dist<=3){
+      // Breathe fire!
+      if(Math.random()<0.3){
+        godFire(tv.r+randi(-2,2),tv.c+randi(-2,2));
+        tv.hp-=randi(5,15);
+        if(tv.hp<=0){destroyVillage(tv);u.target=null;}
+        addEvent('🐉 Drache greift an!','disaster');
+      }
+      // Also attack humans
+      const nearby=sgQuery(u.r,u.c,4).filter(x=>x.type==='human');
+      for(const h of nearby) h.hp-=randi(15,30);
+    } else {
+      const dr=Math.sign(tv.r-u.r),dc=Math.sign(tv.c-u.c);
+      // Dragon can move over any tile
+      const nr=u.r+dr,nc=u.c+dc;
+      if(inBounds(nr,nc)){u.r=nr;u.c=nc;}
+    }
+  } else {
+    if(Math.random()<0.3){const nr=u.r+randi(-1,1),nc=u.c+randi(-1,1);if(inBounds(nr,nc)){u.r=nr;u.c=nc;}}
+  }
+}
+
+// ================================================================
+// KINGDOM TICK
+// ================================================================
+function tickKingdom(k){
+  k.warCooldown=Math.max(0,k.warCooldown-1);
+
+  // Spend resources on population food
+  if(k.resources.food>0) k.resources.food=Math.max(0,k.resources.food-k.population*0.01);
+
+  // War logic
+  if(k.atWarWith.size===0&&k.warCooldown===0&&k.population>6&&Math.random()<0.0012){
+    const enemies=world.kingdoms.filter(o=>o.alive&&o.id!==k.id&&!k.allies.has(o.id)&&o.population>0&&getRelation(k,o)<-20);
+    if(enemies.length>0){
+      enemies.sort((a,b)=>getRelation(k,a)-getRelation(k,b));
+      declareWar(k,enemies[0]);
+    }
+  }
+  // Also random wars
+  if(k.atWarWith.size===0&&k.warCooldown===0&&k.population>10&&Math.random()<0.0005){
+    const others=world.kingdoms.filter(o=>o.alive&&o.id!==k.id&&o.population>0&&!k.allies.has(o.id));
+    if(others.length>0) declareWar(k,others[randi(0,others.length-1)]);
+  }
+
+  // Peace after long war
+  if(k.atWarWith.size>0&&k.age-k.lastWarYear>300&&Math.random()<0.0008){
+    const eid=[...k.atWarWith][0];const enemy=getKingdom(eid);
+    if(enemy) makePeace(k,enemy);
+  }
+
+  // Track war start
+  if(k.atWarWith.size>0&&k.lastWarYear===0) k.lastWarYear=k.age;
+  if(k.atWarWith.size===0) k.lastWarYear=0;
+}
+
+// ================================================================
+// VILLAGE TICK
+// ================================================================
+function tickVillage(v){
+  v.age++;
+  const k=getKingdom(v.kingdomId);
+  if(!k) return;
+
+  // Harvest
+  if(v.age%4===0) harvestNearby(v);
+
+  // Grow population counter
+  const nearPop=world.units.filter(u=>u.villageId===v.id&&u.type==='human').length;
+  v.population=nearPop;
+
+  // Level up
+  const epochBonus=EPOCH_BONUSES[k.epoch];
+  const popNeeded=[3,8,20,50,100][v.level-1]||999;
+  if(v.population>=popNeeded&&v.level<5&&v.buildProgress>=100){
+    v.level++;
+    v.buildProgress=0;
+    v.maxHp=100+v.level*60;
+    world.tiles[v.r][v.c]=v.level>=3?T.CASTLE:T.VILLAGE;
+    updateTerritory(v);
+    addEvent(`${k.name}: Siedlung Level ${v.level}!`,'found');
+    addChronicle(`${k.name} Siedlung wächst zu Level ${v.level}`,'found',k.color);
+  }
+  if(v.age%epochBonus.buildTime===0&&Math.random()<0.4) v.buildProgress=Math.min(100,v.buildProgress+10);
+
+  // Build roads
+  if(v.age%60===0&&Math.random()<0.35&&k.resources.stone>2){
+    const dir=[[-1,0],[1,0],[0,-1],[0,1]][randi(0,3)];
+    const nr=v.r+dir[0],nc=v.c+dir[1];
+    if(inBounds(nr,nc)&&(world.tiles[nr][nc]===T.GRASS||world.tiles[nr][nc]===T.SAND)){
+      world.tiles[nr][nc]=T.ROAD;
+      world.tileVariant[nr][nc]=(Math.random()*4)|0;
+      k.resources.stone-=2;
+    }
+  }
+
+  // Build farm
+  if(!v.buildings.includes('farm')&&k.resources.wood>15&&v.level>=1&&v.age%100===0&&Math.random()<0.3){
+    for(let dr=-3;dr<=3;dr++) for(let dc=-3;dc<=3;dc++){
+      const nr=v.r+dr,nc=v.c+dc;
+      if(!inBounds(nr,nc)) continue;
+      if(world.tiles[nr][nc]===T.GRASS&&Math.random()<0.3){
+        world.tiles[nr][nc]=T.FARM;
+        initTileResources(nr,nc);
+        k.resources.wood-=3;
+        if(k.resources.wood<0){k.resources.wood=0;break;}
+      }
+    }
+    v.buildings.push('farm');
+  }
+
+  // Build mine
+  if(!v.buildings.includes('mine')&&v.level>=2&&k.resources.stone>10&&Math.random()<0.002){
+    for(let dr=-4;dr<=4;dr++) for(let dc=-4;dc<=4;dc++){
+      const nr=v.r+dr,nc=v.c+dc;
+      if(!inBounds(nr,nc)) continue;
+      if(world.tiles[nr][nc]===T.MOUNTAIN&&Math.random()<0.2){
+        world.tiles[nr][nc]=T.MINE;
+        initTileResources(nr,nc);
+        v.buildings.push('mine');break;
+      }
+    }
+  }
+
+  // Build walls
+  if(!v.buildings.includes('wall')&&v.level>=3&&k.resources.stone>30&&Math.random()<0.001){
+    const wr=2+v.level;
+    for(let angle=0;angle<360;angle+=15){
+      const nr=Math.round(v.r+wr*Math.sin(angle*Math.PI/180));
+      const nc=Math.round(v.c+wr*Math.cos(angle*Math.PI/180));
+      if(inBounds(nr,nc)&&world.tiles[nr][nc]===T.GRASS){
+        world.tiles[nr][nc]=T.WALL;
+        k.resources.stone-=1;
+      }
+    }
+    v.buildings.push('wall');
+  }
+
+  // Update territory periodically
+  if(v.age%50===0) updateTerritory(v);
+
+  // Spawn farmers/workers near resources
+  if(v.age%200===0&&nearPop>3&&world.units.length<MAX_UNITS*0.9){
+    const nb=getEmptyNeighbors(v.r,v.c);
+    if(nb.length>0){
+      const pos=nb[randi(0,nb.length-1)];
+      const worker=new Unit('human',pos.r,pos.c);
+      worker.kingdomId=v.kingdomId;worker.villageId=v.id;
+      worker.warrior=Math.random()<0.25;
+      world.units.push(worker);
+    }
+  }
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+function getKingdom(id){return id?world.kingdoms.find(k=>k.id===id):null;}
+function inBounds(r,c){return r>=0&&r<ROWS&&c>=0&&c<COLS;}
+function randi(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function clamp(v,mn,mx){return Math.min(mx,Math.max(mn,v));}
+function randomDir(){const d=[[-1,0],[1,0],[0,-1],[0,1]];return d[randi(0,3)];}
+
+function move(u,dir){
+  const dr=Array.isArray(dir)?dir[0]:dir.dr;
+  const dc=Array.isArray(dir)?dir[1]:dir.dc;
+  const nr=clamp(u.r+dr,0,ROWS-1),nc=clamp(u.c+dc,0,COLS-1);
+  const t=world.tiles[nr][nc];
+  if(u.type==='dragon'){u.r=nr;u.c=nc;return;}
+  if(t===T.WATER||t===T.MOUNTAIN||t===T.WALL) return;
+  u.r=nr;u.c=nc;
+}
+
+function getEmptyNeighbors(r,c){
+  return [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]].map(([dr,dc])=>({r:r+dr,c:c+dc}))
+    .filter(p=>inBounds(p.r,p.c)&&world.tiles[p.r][p.c]!==T.WATER&&world.tiles[p.r][p.c]!==T.MOUNTAIN&&world.tiles[p.r][p.c]!==T.WALL&&!world.units.some(u=>u.r===p.r&&u.c===p.c));
+}
+function findNearbyVillage(r,c,dist,kId){
+  return world.villages.find(v=>Math.abs(v.r-r)+Math.abs(v.c-c)<=dist&&(kId==null||v.kingdomId===kId))||null;
+}
+function findNearestEnemy(r,c,enemyKid,maxDist){
+  let best=null,bestD=maxDist||9999;
+  for(const u of world.units){
+    if(u.kingdomId!==enemyKid||u.hp<=0) continue;
+    const d=Math.abs(u.r-r)+Math.abs(u.c-c);
+    if(d<bestD){bestD=d;best=u;}
+  }
+  return best;
+}
+function removeUnitsAt(r,c){world.units=world.units.filter(u=>!(u.r===r&&u.c===c));}
+
+// ================================================================
+// RENDERING
+// ================================================================
+let renderFrame=0;
+
+function renderAll(){
+  renderFrame++;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Territory layer (fast)
+  renderTerritory();
+
+  // Tiles
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) renderTile(r,c);
+
+  // Fire overlay
+  for(const key of world.fireTiles){
+    const r=(key/10000)|0,c=key%10000;
+    if(!inBounds(r,c)) continue;
+    ctx.fillStyle=renderFrame%4<2?'rgba(255,80,0,.7)':'rgba(255,150,0,.5)';
+    ctx.fillRect(c*TILE,r*TILE,TILE,TILE);
+  }
+
+  renderUnits();
+  renderParticles();
+}
+
+function renderTerritory(){
+  for(const [key,kid] of Object.entries(world.territory)){
+    const [r,c]=key.split(',').map(Number);
+    if(!inBounds(r,c)) continue;
+    const k=getKingdom(kid);
+    if(!k) continue;
+    ctx.fillStyle=k.color+'22';
+    ctx.fillRect(c*TILE,r*TILE,TILE,TILE);
+  }
+}
+
+function renderTile(r,c){
+  const t=world.tiles[r][c];
+  const v=world.tileVariant[r][c];
+  const base=TILE_BASE[t];
+  if(!base) return;
+  ctx.fillStyle=base[v%base.length];
+  ctx.fillRect(c*TILE,r*TILE,TILE,TILE);
+
+  const x=c*TILE,y=r*TILE;
+
+  if(t===T.FOREST){
+    ctx.fillStyle='#0d3a0d';ctx.fillRect(x+2,y+2,4,4);
+    ctx.fillStyle='#225522';ctx.fillRect(x+1,y+4,6,3);
+    ctx.fillStyle='#1a481a';ctx.fillRect(x+3,y+1,2,3);
+  } else if(t===T.MOUNTAIN){
+    ctx.fillStyle='#484038';ctx.fillRect(x+2,y+1,4,5);
+    ctx.fillStyle='#e8ddd0';ctx.fillRect(x+3,y+1,2,2);
+    ctx.fillStyle='#605040';ctx.fillRect(x+1,y+4,6,3);
+  } else if(t===T.VILLAGE){
+    // House
+    ctx.fillStyle='#7a4828';ctx.fillRect(x+1,y+3,6,5);
+    ctx.fillStyle='#b83a3a';ctx.fillRect(x+1,y+1,6,3);
+    ctx.fillStyle='#e8c880';ctx.fillRect(x+3,y+4,2,4);
+    // Window
+    ctx.fillStyle='#ffe0a0';ctx.fillRect(x+2,y+4,1,2);ctx.fillRect(x+5,y+4,1,2);
+  } else if(t===T.CASTLE){
+    ctx.fillStyle='#504840';ctx.fillRect(x,y,TILE,TILE);
+    ctx.fillStyle='#807060';ctx.fillRect(x+1,y+2,2,6);ctx.fillRect(x+5,y+2,2,6);
+    ctx.fillStyle='#908070';ctx.fillRect(x+1,y+1,6,3);
+    ctx.fillStyle='#302820';ctx.fillRect(x+3,y+4,2,4);
+    // Battlements
+    ctx.fillStyle='#707060';ctx.fillRect(x+1,y,2,2);ctx.fillRect(x+5,y,2,2);
+  } else if(t===T.FARM){
+    ctx.fillStyle='#607030';ctx.fillRect(x,y,TILE,4);
+    ctx.fillStyle='#80a030';ctx.fillRect(x,y+4,TILE,4);
+    ctx.fillStyle='#c0b060';ctx.fillRect(x+3,y,2,TILE);
+  } else if(t===T.MINE){
+    ctx.fillStyle='#302820';ctx.fillRect(x+2,y+2,4,5);
+    ctx.fillStyle='#604840';ctx.fillRect(x+3,y+1,2,3);
+    ctx.fillStyle='#a89868';ctx.fillRect(x+2,y+4,1,1);ctx.fillRect(x+5,y+3,1,1);
+  } else if(t===T.WALL){
+    ctx.fillStyle='#888070';ctx.fillRect(x+1,y,6,TILE);
+    ctx.fillStyle='#a09080';ctx.fillRect(x+1,y,6,3);
+    ctx.fillStyle='#606050';ctx.fillRect(x+3,y,2,TILE);
+  } else if(t===T.RUIN){
+    ctx.fillStyle='#504840';ctx.fillRect(x+1,y+3,3,4);ctx.fillRect(x+5,y+4,2,3);
+    ctx.fillStyle='#383028';ctx.fillRect(x+2,y+1,2,3);
+  } else if(t===T.GOLD_ORE){
+    ctx.fillStyle='#504030';ctx.fillRect(x,y,TILE,TILE);
+    ctx.fillStyle='#d4a020';ctx.fillRect(x+2,y+2,2,2);ctx.fillRect(x+5,y+4,2,2);
+    ctx.fillStyle='#f8c030';ctx.fillRect(x+3,y+3,1,1);
+  } else if(t===T.WATER){
+    const anim=(renderFrame+c+r)%8;
+    if(anim<3){ctx.fillStyle='rgba(80,160,240,.18)';ctx.fillRect(x,y+1,TILE,2);}
+  } else if(t===T.ROAD){
+    ctx.fillStyle='#807050';ctx.fillRect(x+2,y,4,TILE);ctx.fillRect(x,y+2,TILE,4);
+    ctx.fillStyle='#909868';ctx.fillRect(x+3,y+3,2,2);
+  } else if(t===T.SAND){
+    // Dune detail
+    ctx.fillStyle='#d0c878';ctx.fillRect(x,y+5,TILE,3);
+  } else if(t===T.SNOW){
+    ctx.fillStyle='rgba(255,255,255,.25)';ctx.fillRect(x,y,TILE,TILE);
+  } else if(t===T.FIRE_TILE){
+    ctx.fillStyle=renderFrame%3===0?'#ff4000':'#ff8000';
+    ctx.fillRect(x+1,y,6,TILE);
+    ctx.fillStyle='#ffcc00';ctx.fillRect(x+3,y+2,2,4);
+  }
+
+  // Kingdom color dot on village/castle
+  if(t===T.VILLAGE||t===T.CASTLE){
+    const vv=world.villages.find(vv=>vv.r===r&&vv.c===c);
+    if(vv){
+      const k=getKingdom(vv.kingdomId);
+      if(k){
+        ctx.fillStyle=k.color;
+        ctx.fillRect(x+6,y,2,2);
+        // Capital star
+        if(vv.isCapital){ctx.fillStyle='#ffcc00';ctx.fillRect(x+6,y,2,2);}
+      }
+    }
+  }
+}
+
+function renderUnits(){
+  for(const u of world.units){
+    const x=u.c*TILE,y=u.r*TILE;
+    switch(u.type){
+      case 'human':{
+        const k=getKingdom(u.kingdomId);
+        const col=k?k.color:'#aaaaaa';
+        // Body
+        ctx.fillStyle=col;ctx.fillRect(x+3,y+3,2,3);
+        // Head
+        ctx.fillStyle='#e8c898';ctx.fillRect(x+2,y+1,4,3);
+        if(u.isKing){ctx.fillStyle='#ffcc00';ctx.fillRect(x+2,y,4,1);}
+        if(u.state==='war'){ctx.fillStyle='rgba(255,0,0,.4)';ctx.fillRect(x+1,y,6,7);}
+        if(u.hunger>80){ctx.fillStyle='rgba(200,200,0,.3)';ctx.fillRect(x,y,TILE,TILE);}
+        break;
+      }
+      case 'animal':
+        ctx.fillStyle='#c8b888';ctx.fillRect(x+1,y+3,6,3);ctx.fillRect(x+2,y+2,4,2);
+        break;
+      case 'wolf':
+        ctx.fillStyle='#787878';ctx.fillRect(x+1,y+3,5,3);
+        ctx.fillStyle='#555555';ctx.fillRect(x+2,y+2,4,2);ctx.fillRect(x+6,y+1,2,2);
+        ctx.fillStyle='#cc2020';ctx.fillRect(x+6,y+2,1,1);
+        break;
+      case 'dragon':
+        ctx.fillStyle='#802000';ctx.fillRect(x,y+2,TILE,5);
+        ctx.fillStyle='#c03010';ctx.fillRect(x+2,y+1,4,6);
+        ctx.fillStyle='#ff8000';ctx.fillRect(x+6,y+3,2,2);
+        ctx.fillStyle='#ffcc00';ctx.fillRect(x+1,y,2,3);ctx.fillRect(x+5,y,2,3);
+        break;
+    }
+    // HP bar for damaged units
+    if(u.hp<u.maxHp&&u.hp>0){
+      ctx.fillStyle='#400000';ctx.fillRect(x,y+7,TILE,1);
+      ctx.fillStyle=u.hp/u.maxHp>0.5?'#00cc00':'#cc4400';
+      ctx.fillRect(x,y+7,Math.ceil(TILE*u.hp/u.maxHp),1);
+    }
+  }
+}
+
+function renderParticles(){
+  for(const p of world.particles){
+    const alpha=p.life/p.maxLife;
+    const dy=(1-alpha)*12;
+    const x=p.c*TILE+(TILE-12)/2,y=p.r*TILE-dy;
+    ctx.globalAlpha=alpha;
+    ctx.font='12px serif';
+    ctx.fillText(p.icon,x,y+12);
+    ctx.globalAlpha=1;
+  }
+}
+
+// ================================================================
+// UI
+// ================================================================
+function updateUI(){
+  const humans=world.units.filter(u=>u.type==='human').length;
+  const animals=world.units.filter(u=>u.type==='animal').length;
+  const activeK=world.kingdoms.filter(k=>k.alive).length;
+  const wars=world.kingdoms.filter(k=>k.alive&&k.atWarWith.size>0).length;
+
+  document.getElementById('s-humans').textContent=humans;
+  document.getElementById('s-villages').textContent=world.villages.length;
+  document.getElementById('s-kingdoms').textContent=activeK;
+  document.getElementById('s-wars').textContent=Math.floor(wars/2);
+  document.getElementById('s-animals').textContent=animals;
+  document.getElementById('year-val').textContent=world.year;
+
+  // Dominant epoch
+  const epochs=world.kingdoms.filter(k=>k.alive).map(k=>k.epoch);
+  const avgEpoch=epochs.length?Math.round(epochs.reduce((a,b)=>a+b,0)/epochs.length):0;
+  document.getElementById('s-year-era').textContent=EPOCH[avgEpoch];
+}
+
+function updateKingdomPanel(){
+  const list=document.getElementById('kingdoms-list');
+  const active=world.kingdoms.filter(k=>k.alive).sort((a,b)=>b.population-a.population);
+  if(active.length===0){
+    list.innerHTML='<div style="color:var(--dim);font-size:13px;padding:8px;text-align:center;">Noch keine Reiche.<br>Platziere Menschen!</div>';
+    return;
+  }
+  list.innerHTML=active.map(k=>{
+    const warText=[...k.atWarWith].map(id=>{const e=getKingdom(id);return e?`<span class="war-badge">⚔${e.name}</span>`:''}).join('');
+    const allyText=[...k.allies].map(id=>{const e=getKingdom(id);return e?`<span class="ally-badge">⚑${e.name}</span>`:''}).join('');
+    const kingUnit=k.kingId?world.units.find(u=>u.id===k.kingId):null;
+    const popBar=Math.min(100,k.population*2);
+    const resStr=`🪵${Math.floor(k.resources.wood)} ⛏${Math.floor(k.resources.stone)} 🌾${Math.floor(k.resources.food)} 💰${Math.floor(k.resources.gold)}`;
+    const sel=sim.selectedKingdom===k.id?' selected':'';
+    return `<div class="kingdom-card${sel}" onclick="selectKingdom(${k.id})">
+      <div class="kingdom-header">
+        <div class="kingdom-color" style="background:${k.color}"></div>
+        <div class="kingdom-name" style="max-width:120px">${k.name}</div>
+        <span class="${EPOCH_COLOR[k.epoch]}" style="font-size:9px;padding:1px 3px;border-radius:2px;margin-left:2px">${['⛏','🥉','⚙','🏰'][k.epoch]}</span>
+      </div>
+      <div class="kingdom-stats">
+        👥<span class="ks">${k.population}</span> ⚔<span class="ks">${k.warriors}</span> 🏘<span class="ks">${k.villages.length}</span>
+        ${kingUnit?`<br>👑<span class="ks" style="font-size:11px">König</span>`:''}
+      </div>
+      <div style="font-size:11px;color:var(--dim);margin-top:2px">${resStr}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${popBar}%;background:${k.color}"></div></div>
+      <div style="font-size:10px;margin-top:2px">${warText}${allyText}</div>
+      <div class="epoch-badge ${EPOCH_COLOR[k.epoch]}">${EPOCH[k.epoch]}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectKingdom(kid){
+  sim.selectedKingdom=kid;
+  const k=getKingdom(kid);
+  if(!k) return;
+  // Switch to detail tab
+  switchTab('detail');
+  showKingdomDetail(k);
+}
+
+function showKingdomDetail(k){
+  const dp=document.getElementById('detail-panel');
+  const others=world.kingdoms.filter(o=>o.alive&&o.id!==k.id);
+  const relHtml=others.map(o=>{
+    const rel=getRelation(k,o);
+    const col=rel>30?'#40cc60':rel<-30?'#cc4040':'#888888';
+    const w=Math.min(80,Math.abs(rel)*0.8);
+    return `<div class="rel-bar-wrap"><div style="width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--dim)">${o.name}</div><div style="width:${w}px;height:4px;background:${col};border-radius:2px"></div><div style="font-size:11px;color:${col};margin-left:4px">${rel>0?'+':''}${Math.floor(rel)}</div></div>`;
+  }).join('');
+  dp.innerHTML=`
+    <h3>${k.name}</h3>
+    <div class="dp-row"><span class="dp-label">Epoche</span><span class="dp-val">${EPOCH[k.epoch]}</span></div>
+    <div class="dp-row"><span class="dp-label">Technologie</span><span class="dp-val">${Math.floor(k.techPoints)}/${EPOCH_THRESHOLDS[Math.min(3,k.epoch+1)]}</span></div>
+    <div class="dp-row"><span class="dp-label">Bevölkerung</span><span class="dp-val">${k.population}</span></div>
+    <div class="dp-row"><span class="dp-label">Krieger</span><span class="dp-val">${k.warriors}</span></div>
+    <div class="dp-row"><span class="dp-label">Siedlungen</span><span class="dp-val">${k.villages.length}</span></div>
+    <div class="dp-row"><span class="dp-label">Alter</span><span class="dp-val">${k.age} Jahre</span></div>
+    <div style="height:1px;background:var(--border);margin:6px 0"></div>
+    <div style="font-size:12px;color:var(--dim);margin-bottom:3px">RESSOURCEN</div>
+    <div class="dp-row"><span class="dp-label">🪵 Holz</span><span class="dp-val">${Math.floor(k.resources.wood)}</span></div>
+    <div class="dp-row"><span class="dp-label">⛏ Stein</span><span class="dp-val">${Math.floor(k.resources.stone)}</span></div>
+    <div class="dp-row"><span class="dp-label">🌾 Nahrung</span><span class="dp-val">${Math.floor(k.resources.food)}</span></div>
+    <div class="dp-row"><span class="dp-label">💰 Gold</span><span class="dp-val">${Math.floor(k.resources.gold)}</span></div>
+    <div style="height:1px;background:var(--border);margin:6px 0"></div>
+    <div style="font-size:12px;color:var(--dim);margin-bottom:3px">DIPLOMATIE</div>
+    ${relHtml||'<div style="color:var(--dim);font-size:12px">Keine anderen Reiche</div>'}
+  `;
+}
+
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.toggle('active',t.id==='tab-'+name));
+}
+
+function addEvent(msg,type){
+  const container=document.getElementById('event-messages');
+  const el=document.createElement('span');
+  el.className=`event-msg event-${type}`;
+  el.textContent=`[${world.year}] ${msg}  `;
+  container.appendChild(el);
+  if(container.children.length>8) container.removeChild(container.firstChild);
+  setTimeout(()=>{if(el.parentNode)el.remove();},14000);
+}
+
+function addChronicle(msg,type,color){
+  world.chronicle.unshift({msg,type,color,year:world.year});
+  if(world.chronicle.length>120) world.chronicle.pop();
+  const list=document.getElementById('chronicle-list');
+  const entry=document.createElement('div');
+  entry.className=`chron-entry chron-${type}`;
+  entry.innerHTML=`<span style="color:${color||'#888'}">[${world.year}]</span> ${msg}`;
+  list.insertBefore(entry,list.firstChild);
+  if(list.children.length>80) list.removeChild(list.lastChild);
+}
+
+// ================================================================
+// GAME LOOP
+// ================================================================
+function gameLoop(ts){
+  requestAnimationFrame(gameLoop);
+  const interval=sim.tickMs/SPEED_VALS[sim.speedIdx];
+  if(!sim.paused&&ts-sim.lastTick>interval){
+    sim.lastTick=ts;
+    tick();
+    renderAll();
+  } else if(sim.paused){
+    // Still render particles
+    renderAll();
+  }
+}
+
+// ================================================================
+// INPUT: MOUSE / TOUCH / ZOOM
+// ================================================================
+function canvasCoords(clientX,clientY){
+  const rect=canvas.getBoundingClientRect();
+  const sx=canvas.width/rect.width;
+  const sy=canvas.height/rect.height;
+  const c=Math.floor((clientX-rect.left)*sx/TILE);
+  const r=Math.floor((clientY-rect.top)*sy/TILE);
+  return {r,c};
+}
+
+canvas.addEventListener('mousedown',e=>{
+  if(e.button===2){// right click = drag
+    sim.dragging=true;
+    sim.dragStartX=e.clientX;sim.dragStartY=e.clientY;
+    return;
+  }
+  sim.mouseDown=true;
+  const {r,c}=canvasCoords(e.clientX,e.clientY);
+  sim.lastPlaced=`${r},${c}`;
+  placeTool(r,c);
+
+  // Click on village - show detail
+  if(!['lightning','meteor','fire','volcano','quake','heal','rain'].includes(sim.tool)){
+    const v=world.villages.find(v=>v.r===r&&v.c===c);
+    if(v){
+      const k=getKingdom(v.kingdomId);
+      if(k){sim.selectedKingdom=k.id;switchTab('detail');showKingdomDetail(k);}
+    }
+  }
+});
+
+canvas.addEventListener('mousemove',e=>{
+  if(sim.mouseDown){
+    const {r,c}=canvasCoords(e.clientX,e.clientY);
+    const key=`${r},${c}`;
+    if(key!==sim.lastPlaced){sim.lastPlaced=key;placeTool(r,c);}
+  }
+  // Tooltip
+  const {r,c}=canvasCoords(e.clientX,e.clientY);
+  if(inBounds(r,c)){
+    const t=world.tiles[r][c];
+    const tNames={[T.GRASS]:'Gras',[T.WATER]:'Wasser',[T.MOUNTAIN]:'Berg',[T.FOREST]:'Wald',[T.VILLAGE]:'Dorf',[T.CASTLE]:'Burg',[T.ROAD]:'Straße',[T.SAND]:'Wüste',[T.SNOW]:'Schnee',[T.FARM]:'Farm',[T.MINE]:'Mine',[T.WALL]:'Mauer',[T.RUIN]:'Ruine',[T.GOLD_ORE]:'Golderz',[T.FIRE_TILE]:'Feuer'};
+    const v=world.villages.find(v=>v.r===r&&v.c===c);
+    const units=world.units.filter(u=>u.r===r&&u.c===c);
+    const res=world.resources[r+','+c];
+    let html=`<b>${tNames[t]||'?'}</b>`;
+    if(v){const k=getKingdom(v.kingdomId);html+=`<br>${k?k.name:'?'} - Level ${v.level}<br>HP: ${v.hp}/${v.maxHp}`;}
+    if(units.length>0) html+=`<br>${units.map(u=>`${u.type}${u.isKing?'👑':''} HP:${Math.floor(u.hp)}`).join('<br>')}`;
+    if(res&&(res.wood+res.stone+res.gold>0)) html+=`<br>🪵${Math.floor(res.wood)} ⛏${Math.floor(res.stone)} 💰${Math.floor(res.gold)}`;
+    const tip=document.getElementById('tooltip');
+    tip.innerHTML=html;tip.className='show';
+    tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-10)+'px';
+  } else {
+    document.getElementById('tooltip').className='';
+  }
+});
+
+canvas.addEventListener('mouseup',e=>{sim.mouseDown=false;sim.dragging=false;});
+canvas.addEventListener('mouseleave',()=>{sim.mouseDown=false;sim.dragging=false;document.getElementById('tooltip').className='';});
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
+
+// Zoom with mouse wheel
+canvas.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const area=document.getElementById('canvas-area');
+  const rect=area.getBoundingClientRect();
+  // Scale canvas CSS size
+  const curW=parseFloat(canvas.style.width)||canvas.width;
+  const curH=parseFloat(canvas.style.height)||canvas.height;
+  const factor=e.deltaY<0?1.1:0.91;
+  const newW=clamp(curW*factor,canvas.width*0.4,canvas.width*4);
+  const newH=clamp(curH*factor,canvas.height*0.4,canvas.height*4);
+  canvas.style.width=newW+'px';
+  canvas.style.height=newH+'px';
+  // Keep centered
+  canvas.style.left=((rect.width-newW)/2)+'px';
+  canvas.style.top=((rect.height-newH)/2)+'px';
+},{passive:false});
+
+// Touch
+canvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  const touch=e.touches[0];
+  const {r,c}=canvasCoords(touch.clientX,touch.clientY);
+  placeTool(r,c);
+},{passive:false});
+
+// Tool buttons
+document.querySelectorAll('.tool-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    sim.tool=btn.dataset.tool;
+  });
+});
+
+// Brush size
+document.querySelectorAll('.bs-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.bs-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    sim.brushSize=parseInt(btn.dataset.size);
+  });
+});
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>switchTab(btn.dataset.tab));
+});
+
+// Controls
+document.getElementById('btn-pause').addEventListener('click',()=>{
+  sim.paused=!sim.paused;
+  const btn=document.getElementById('btn-pause');
+  const ov=document.getElementById('pause-overlay');
+  btn.textContent=sim.paused?'▶':'⏸';
+  btn.classList.toggle('active-btn',sim.paused);
+  ov.classList.toggle('show',sim.paused);
+});
+document.getElementById('btn-faster').addEventListener('click',()=>{
+  sim.speedIdx=Math.min(SPEED_VALS.length-1,sim.speedIdx+1);
+  document.getElementById('speed-display').textContent=SPEED_LABELS[sim.speedIdx];
+});
+document.getElementById('btn-slower').addEventListener('click',()=>{
+  sim.speedIdx=Math.max(0,sim.speedIdx-1);
+  document.getElementById('speed-display').textContent=SPEED_LABELS[sim.speedIdx];
+});
+document.getElementById('btn-reset').addEventListener('click',()=>{
+  if(confirm('Welt zurücksetzen?')){initWorld();}
+});
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();document.getElementById('btn-pause').click();}
+  if(e.code==='Period') document.getElementById('btn-faster').click();
+  if(e.code==='Comma')  document.getElementById('btn-slower').click();
+});
+
+// Canvas resize
+function resizeCanvas(){
+  const area=document.getElementById('canvas-area');
+  const aW=area.clientWidth,aH=area.clientHeight;
+  const scale=Math.min(aW/canvas.width,aH/canvas.height);
+  canvas.style.width=(canvas.width*scale)+'px';
+  canvas.style.height=(canvas.height*scale)+'px';
+  canvas.style.position='absolute';
+  canvas.style.left=((aW-canvas.width*scale)/2)+'px';
+  canvas.style.top=((aH-canvas.height*scale)/2)+'px';
+}
+window.addEventListener('resize',resizeCanvas);
+
+// ================================================================
+// START
+// ================================================================
+initWorld();
+resizeCanvas();
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>
